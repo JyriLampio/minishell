@@ -1,57 +1,80 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: alogvine <alogvine@student.hive.fi>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/08/16 10:36:37 by alogvine          #+#    #+#             */
+/*   Updated: 2024/08/16 13:04:40 by alogvine         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+#include "minishell.h"
 
-size_t	ft_strlen(const char *str)
+void	add_to_structs(t_minishell *minishell, char *line)
 {
-	size_t	i;
+	int		i;
+	int		n;
+	int		t;
+	char	**argline;
+	char	**pipeline;
+	char	**arg;
 
-	i = 0;
-	while (str[i])
-		i++;
-	return (i);
-}
-
-void	ft_strcpy(char *dst, const char *src)
-{
-	while (*src)	
-		*dst++ = *src++;
-	*dst = '\0';
-}
-
-char	*ft_strjoin(char *s1, char *s2)
-{
-	char *join;
-
-	if (!s1 || !s2)
-		return (NULL);
-	join = malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
-	if (!join)
-		return (NULL);
-	ft_strcpy(join, s1);
-	ft_strcpy(join + ft_strlen(s1), s2);
-	return (join);
+	if (*line)
+	{
+		n = 0;
+		pipeline = ft_split(line, '|');
+		arg = malloc(sizeof(char **));
+		arg[0][0] = 0;
+		while (pipeline[n])
+		{
+			i = 0;
+			t = 0;
+			printf("PIPELINE[%d]: %s\n", n, pipeline[n]);
+			argline = ft_split(pipeline[n], ' ');
+			minishell[n].cmd = argline[i];
+			i++;
+			while (argline[i])
+			{
+				arg[n] = ft_strjoin(arg[n], argline[i]);
+				if (argline[i + 1])
+					arg[n] = ft_strjoin(arg[n], " ");
+				i++;
+			}
+			minishell[n].arg = arg[n];
+			n++;
+		}
+		i = 0;
+		while (i < n)
+		{
+			printf("MINISHELL[%d].CMD: %s\n", i, minishell[i].cmd);
+			printf("MINISHELL[%d].ARG: %s\n", i, minishell[i].arg);
+			i++;
+		}
+	}
 }
 
 int	main(int ac, char **av, char **envp)
 {
 	(void)av;
 	(void)envp;
-	char	*line;
-	char	*str;
+	char		*line;
+	t_minishell	*minishell;
 
 	if (ac == 1)
 	{
+		minishell = malloc(sizeof(t_minishell));
 		while (1)
 		{
-			str = malloc(sizeof(char*) + 1);
-//			str = getcwd(0, 0);
-			str = ft_strjoin("minishell> ", str);
-//			str = ft_strjoin(str, " $ ");
-			line = readline(str);
+			line = readline("minishell> ");
+			add_to_structs(minishell, line);
 		}
 	}
-	return (0);
+	exit(0);
 }
