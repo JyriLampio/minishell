@@ -6,57 +6,81 @@
 /*   By: alogvine <alogvine@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 10:36:37 by alogvine          #+#    #+#             */
-/*   Updated: 2024/08/16 13:04:40 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/08/21 10:32:30 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <readline/readline.h>
-#include <readline/history.h>
 #include "minishell.h"
 
-void	add_to_structs(t_minishell *minishell, char *line)
+int	add_to_structs(t_minishell **minishell, char *line)
 {
 	int		i;
 	int		n;
-	int		t;
 	char	**argline;
 	char	**pipeline;
-	char	**arg;
+	char	*arg;
+	char	*temp;
 
+	i = 0;
+	n = 1;
+	while (line[i++])
+		if (line[i] == '|')
+			n++;
+	*minishell = malloc(sizeof(t_minishell) * n);
 	if (*line)
 	{
+		i = 0;
 		n = 0;
 		pipeline = ft_split(line, '|');
-		arg = malloc(sizeof(char **));
-		arg[0][0] = 0;
 		while (pipeline[n])
 		{
 			i = 0;
-			t = 0;
-			printf("PIPELINE[%d]: %s\n", n, pipeline[n]);
 			argline = ft_split(pipeline[n], ' ');
-			minishell[n].cmd = argline[i];
+			(*minishell)[n].cmd = ft_strdup(argline[i]);
 			i++;
-			while (argline[i])
+			if (argline[i] && !ft_strcmp("echo", (*minishell)[n].cmd) && !ft_strcmp(argline[i], "-n"))
 			{
-				arg[n] = ft_strjoin(arg[n], argline[i]);
-				if (argline[i + 1])
-					arg[n] = ft_strjoin(arg[n], " ");
+				(*minishell)[n].cmd = ft_strjoin((*minishell)[n].cmd, " -n");
 				i++;
 			}
-			minishell[n].arg = arg[n];
+			arg = ft_strdup("");
+			while (argline[i])
+			{
+				temp = arg;
+				arg = ft_strjoin(arg, argline[i]);
+				free(temp);
+				if (argline[i + 1])
+				{
+					temp = arg;
+					arg = ft_strjoin(arg, " ");
+					free(temp);
+				}
+				i++;
+			}
+			(*minishell)[n].arg = arg;
+			i = 0;
+			while (argline[i])
+				free(argline[i++]);
+			free(argline);
 			n++;
 		}
 		i = 0;
-		while (i < n)
-		{
-			printf("MINISHELL[%d].CMD: %s\n", i, minishell[i].cmd);
-			printf("MINISHELL[%d].ARG: %s\n", i, minishell[i].arg);
-			i++;
-		}
+		while (pipeline[i])
+			free(pipeline[i++]);
+		free(pipeline);
+	}
+	return (n);
+}
+
+void	do_command(t_minishell *minishell, int cmds)
+{
+	int	i;
+
+	i = 0;
+	while (i < cmds)
+	{
+		check_builtins(minishell, i);
+		i++;
 	}
 }
 
@@ -66,15 +90,19 @@ int	main(int ac, char **av, char **envp)
 	(void)envp;
 	char		*line;
 	t_minishell	*minishell;
+	int			cmds;
 
 	if (ac == 1)
 	{
-		minishell = malloc(sizeof(t_minishell));
 		while (1)
 		{
 			line = readline("minishell> ");
-			add_to_structs(minishell, line);
+			if (!line || !*line)
+				continue ;
+			cmds = add_to_structs(&minishell, line);
+			do_command(minishell, cmds);
+			free(minishell);
 		}
 	}
-	exit(0);
+	return (0);
 }
