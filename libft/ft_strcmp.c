@@ -6,7 +6,7 @@
 /*   By: alogvine <alogvine@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 11:52:27 by alogvine          #+#    #+#             */
-/*   Updated: 2024/08/19 12:00:04 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/08/30 17:04:54 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,4 +29,3 @@ int	ft_strcmp(const char *s1, const char *s2)
 	}
 	return (str1[i] - str2[i]);
 }
-

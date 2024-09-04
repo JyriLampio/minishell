@@ -6,7 +6,7 @@
 /*   By: alogvine <alogvine@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 11:44:43 by alogvine          #+#    #+#             */
-/*   Updated: 2024/08/21 13:02:49 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/04 11:05:42 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,37 +14,57 @@
 
 void	free_and_exit(t_minishell *minishell)
 {
+	ft_putstr_fd("exit\n", 1);
 	free(minishell);
 	exit(0);
 }
 
-void	cmd_echo(t_minishell *minishell, int i, int line)
+void	cmd_echo(t_minishell *minishell, int line)
 {
 	if (line)
-		printf("%s\n", minishell[i].arg);
+	{
+		ft_putstr_fd(minishell->arg, 1);
+		ft_putstr_fd("\n", 1);
+	}
 	else
-		printf("%s", minishell[i].arg);
+		ft_putstr_fd(minishell->arg, 1);
 }
 
-void	check_builtins(t_minishell *minishell, int i)
+static void	print_env(t_env *env)
 {
+	t_env	*current;
 
-	if (!ft_strcmp("echo", minishell[i].cmd))
-		cmd_echo(minishell, i, 1);
-	else if (!ft_strcmp("echo -n", minishell[i].cmd))
-		cmd_echo(minishell, i, 0);
-	else if (!ft_strcmp("cd", minishell[i].cmd))
+	current = env;
+	while (current != NULL)
+	{
+		printf("%s=\"%s\"\n", current->key, current->value);
+		current = current->next;
+	}
+}
+
+void	check_builtins(t_minishell *minishell)
+{
+	if (!ft_strcmp("echo", minishell->cmd))
+		cmd_echo(minishell, 1);
+	else if (!ft_strcmp("echo -n", minishell->cmd))
+		cmd_echo(minishell, 0);
+	else if (!ft_strcmp("cd", minishell->cmd))
 		printf("BUILTIN: CD\n");
-	else if (!ft_strcmp("pwd", minishell[i].cmd))
+	else if (!ft_strcmp("pwd", minishell->cmd))
 		printf("BUILTIN: PWD\n");
-	else if (!ft_strcmp("export", minishell[i].cmd))
-		printf("BUILTIN: EXPORT\n");
-	else if (!ft_strcmp("unset", minishell[i].cmd))
+	else if (!ft_strcmp("export", minishell->cmd))
+		printf("BUILTIN: export\n");
+	else if (!ft_strcmp("unset", minishell->cmd))
 		printf("BUILTIN: UNSET\n");
-	else if (!ft_strcmp("env", minishell[i].cmd))
-		printf("BUILTIN: ENV\n");
-	else if (!ft_strcmp("exit", minishell[i].cmd))
+	else if (!ft_strcmp("env", minishell->cmd))
+	{
+		if (minishell->arg)
+			printf("env: '%s': No such file or directory\n", minishell->arg);
+		else
+			print_env(minishell->env);
+	}
+	else if (!ft_strcmp("exit", minishell->cmd))
 		free_and_exit(minishell);
 	else
-		printf("CMD NOT FOUND!!!!!!!!!!!\n");
+		ft_putstr_fd("Checking execve...\n", 1);
 }
