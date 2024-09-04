@@ -6,7 +6,7 @@
 /*   By: alogvine <alogvine@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 11:44:43 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/04 11:05:42 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/04 13:27:33 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,12 +57,7 @@ void	check_builtins(t_minishell *minishell)
 	else if (!ft_strcmp("unset", minishell->cmd))
 		printf("BUILTIN: UNSET\n");
 	else if (!ft_strcmp("env", minishell->cmd))
-	{
-		if (minishell->arg)
-			printf("env: '%s': No such file or directory\n", minishell->arg);
-		else
-			print_env(minishell->env);
-	}
+		print_env(minishell->env);
 	else if (!ft_strcmp("exit", minishell->cmd))
 		free_and_exit(minishell);
 	else
