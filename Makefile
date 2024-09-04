@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: alogvine <alogvine@student.hive.fi>        +#+  +:+       +#+         #
+#    By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/16 11:05:56 by alogvine          #+#    #+#              #
-#    Updated: 2024/08/29 15:07:29 by alogvine         ###   ########.fr        #
+#    Updated: 2024/09/04 13:31:54 by jlampio          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,7 +29,7 @@ all: $(NAME)
 
 $(NAME): $(OBJ)
 	make -C $(LIBFT_DIR)
-	$(CC) $(CFLAGS) -lreadline -o $(NAME) $(OBJ) $(LIBFT)
+	$(CC) $(CFLAGS)  -o $(NAME) $(OBJ) $(LIBFT) -lreadline
 
 
 clean:

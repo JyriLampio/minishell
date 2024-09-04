@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alogvine <alogvine@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 10:36:37 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/04 13:28:26 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/04 13:30:29 by jlampio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -187,7 +187,7 @@ int	main(int ac, char **av, char **envp)
 {
 	char		*line;
 	t_minishell	*minishell;
-	int			cmds;
+	// int			cmds;
 
 	(void)av;
 	(void)envp;
@@ -203,7 +203,7 @@ int	main(int ac, char **av, char **envp)
 				free(line);
 				continue ;
 			}
-			cmds = add_to_structs(minishell, line);
+			add_to_structs(minishell, line);
 			do_command(minishell);
 		}
 	}
