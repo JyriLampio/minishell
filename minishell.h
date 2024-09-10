@@ -6,7 +6,7 @@
 /*   By: alogvine <alogvine@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 10:33:14 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/03 17:56:45 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/04 15:26:28 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@ typedef struct s_cmds
 
 typedef struct s_minishell
 {
-	char	**envp;
 	t_env	*env;
 	t_cmds	*cmds;
 	char	*cmd;
@@ -53,7 +52,8 @@ int		ft_strcmp(const char *s1, const char *s2);
 void	check_builtins(t_minishell *minishell);
 void	ft_putstr_fd(char *s, int fd);
 char	*ft_strchr(const char *s, int i);
-void	parsing_cmds(t_minishell *minishell, char *argline);
+void	parsing_redirs(t_minishell *minishell, char *argline);
 void	ft_bzero(void *s, size_t n);
+void	free_cmds(t_minishell *minishell);
 
 #endif
