@@ -6,7 +6,7 @@
 /*   By: alogvine <alogvine@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 11:44:43 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/11 17:16:07 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/11 19:04:44 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,9 +45,16 @@ static void	print_env(t_env *env)
 void	check_builtins(t_minishell *minishell)
 {
 	t_cmds	*cmds;
+	t_cmds	*curr;
 
 	cmds = minishell->cmds;
-//	printf("CMD: %s\nARG: %s\n", cmds->cmd, cmds->arg);
+	curr = cmds;
+
+	while (curr)
+	{
+		printf("CMD: %s\nARG: %s\n", curr->cmd, curr->arg);
+		curr = curr->next;
+	}
 	if (!ft_strcmp("echo", cmds->cmd))
 		cmd_echo(minishell->cmds);
 	else if (!ft_strcmp("cd", cmds->cmd))

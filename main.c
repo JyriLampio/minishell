@@ -6,7 +6,7 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 10:36:37 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/11 18:25:10 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/11 18:55:24 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,9 +118,8 @@ char	*ft_expjoin(char *new, char *line, t_env *env)
 	key = ft_strdup("");
 	if (line[i] != '$')
 		str = ft_cjoin(new, line[i]);
-	else
+	else if (line[i++])
 	{
-		i++;
 		str = ft_strjoin(new, str);
 		while (line[i] && line[i] != ' ' && line[i] != '"')
 			key = ft_cjoin(key, line[i++]);
@@ -147,7 +146,10 @@ char	*de_quote(char *line, t_env *env)
 		if (line[i] == '\'' || line[i] == '"')
 		{
 			if (check_end_of_quotes(line + i))
-				break ;
+			{
+				ft_putstr_fd("GIT GUD!\n", 1);
+				return (0);
+			}
 			if (line[i++] == '\'')
 				while (line[i] != '\'')
 					new = ft_cjoin(new, line[i++]);
@@ -193,6 +195,8 @@ int	add_to_structs(t_minishell *minishell, char *line)
 	n = 0;
 	(void)minishell;
 	line = de_quote(line, minishell->env);
+	if (!line)
+		return (1);
 	pipeline = ft_split(line, '|');
 	while (pipeline[n++])
 	{

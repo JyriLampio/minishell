@@ -6,7 +6,7 @@
 /*   By: alogvine <alogvine@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 10:33:14 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/11 17:08:08 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/11 18:47:18 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ typedef struct s_cmds
 {
 	char			*cmd;
 	char			*arg;
+//	bool			pipe;
 	struct s_cmds	*next;
 }		t_cmds;
 
