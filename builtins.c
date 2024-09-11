@@ -6,7 +6,7 @@
 /*   By: alogvine <alogvine@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 11:44:43 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/04 14:24:06 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/11 17:16:07 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,15 +19,15 @@ void	free_and_exit(t_minishell *minishell)
 	exit(0);
 }
 
-void	cmd_echo(t_minishell *minishell, int line)
+void	cmd_echo(t_cmds *cmds)
 {
-	if (line)
+	if (cmds->arg[0] == '-' && cmds->arg[1] == 'n')
+		ft_putstr_fd(cmds->arg + 3, 1);
+	else
 	{
-		ft_putstr_fd(minishell->arg, 1);
+		ft_putstr_fd(cmds->arg, 1);
 		ft_putstr_fd("\n", 1);
 	}
-	else
-		ft_putstr_fd(minishell->arg, 1);
 }
 
 static void	print_env(t_env *env)
@@ -44,21 +44,23 @@ static void	print_env(t_env *env)
 
 void	check_builtins(t_minishell *minishell)
 {
-	if (!ft_strcmp("echo", minishell->cmd))
-		cmd_echo(minishell, 1);
-	else if (!ft_strcmp("echo -n", minishell->cmd))
-		cmd_echo(minishell, 0);
-	else if (!ft_strcmp("cd", minishell->cmd))
+	t_cmds	*cmds;
+
+	cmds = minishell->cmds;
+//	printf("CMD: %s\nARG: %s\n", cmds->cmd, cmds->arg);
+	if (!ft_strcmp("echo", cmds->cmd))
+		cmd_echo(minishell->cmds);
+	else if (!ft_strcmp("cd", cmds->cmd))
 		printf("BUILTIN: CD\n");
-	else if (!ft_strcmp("pwd", minishell->cmd))
+	else if (!ft_strcmp("pwd", cmds->cmd))
 		printf("BUILTIN: PWD\n");
-	else if (!ft_strcmp("export", minishell->cmd))
+	else if (!ft_strcmp("export", cmds->cmd))
 		printf("BUILTIN: export\n");
-	else if (!ft_strcmp("unset", minishell->cmd))
+	else if (!ft_strcmp("unset", cmds->cmd))
 		printf("BUILTIN: UNSET\n");
-	else if (!ft_strcmp("env", minishell->cmd))
+	else if (!ft_strcmp("env", cmds->cmd))
 		print_env(minishell->env);
-	else if (!ft_strcmp("exit", minishell->cmd))
+	else if (!ft_strcmp("exit", cmds->cmd))
 		free_and_exit(minishell);
 	else
 		ft_putstr_fd("Checking execve...\n", 1);

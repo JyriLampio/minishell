@@ -6,77 +6,42 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 10:36:37 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/09 14:51:33 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/11 17:54:50 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-/*int	add_to_structs(t_minishell *minishell, char *line)
+t_cmds	*create_cmd(char *pipeline)
 {
-	int		i;
-	int		n;
-	char	**argline;
-	char	**pipeline;
-	char	*arg;
+	t_cmds	*new;
 	char	*temp;
+	char	*arg;
+	char	**argline;
+	int		i;
 
-	i = 0;
-	n = 1;
-	if (*line)
+	new = malloc(sizeof(t_env));
+	if (!new)
+		return (0);
+	argline = ft_split(pipeline, ' ');
+	arg = ft_strdup("");
+	new->cmd = ft_strdup(argline[0]);
+	i = 1;
+	while (argline[i])
 	{
-		i = 0;
-		n = 0;
-		pipeline = ft_split(line, '|');
-		while (pipeline[n])
-		{
-			i = 0;
-			minishell->pipe = 0;
-			if (pipeline[n] && (ft_strchr(pipeline[n], '<') || ft_strchr(pipeline[n], '>')))
-				parsing_redirs(minishell, pipeline[n]);
-			else
-			{
-				arg = ft_strdup("");
-				argline = ft_split(pipeline[n], ' ');
-				if (!argline || !*argline)
-					return (1);
-				minishell->cmd = ft_strdup(argline[i]);
-				i++;
-				if (argline[i] && !ft_strcmp("echo", minishell[n].cmd) && !ft_strcmp(argline[i], "-n"))
-				{
-					minishell->cmd = ft_strjoin(minishell[n].cmd, " -n");
-					i++;
-				}
-				while (argline[i])
-				{
-					temp = arg;
-					arg = ft_strjoin(arg, argline[i]);
-					free(temp);
-					i++;
-					if (argline[i])
-					{
-						temp = arg;
-						arg = ft_strjoin(arg, " ");
-						free(temp);
-					}
-				}
-				minishell->arg = arg;
-				i = 0;
-				while (argline[i])
-					free(argline[i++]);
-				free(argline);
-			}
-			n++;
-		}
-		i = 0;
-		while (pipeline[i])
-			free(pipeline[i++]);
-		free(pipeline);
+		temp = arg;
+		arg = ft_strjoin(arg, argline[i]);
+		i++;
+		if (argline[i])
+			arg = ft_strjoin(arg, " ");
+		free(temp);
 	}
-	return (0);
-}*/
+	new->arg = arg;
+	new->next = 0;
+	return (new);
+}
 
-t_cmds	*init_cmds(char *line)
+t_cmds	*add_cmds(char **pipeline)
 {
 	t_cmds	*cmds;
 	t_cmds	*current;
@@ -84,8 +49,136 @@ t_cmds	*init_cmds(char *line)
 	int		i;
 
 	i = 0;
-
+	while (pipeline[i])
+	{
+		new = create_cmd(pipeline[i]);
+		if (!new)
+			return (0);
+		if (i == 0)
+			cmds = new;
+		else if (current)
+			current->next = new;
+		current = new;
+		i++;
+	}
 	return (cmds);
+}
+
+int	check_end_of_quotes(char *line)
+{
+	int		i;
+	char	quote;
+
+	i = 0;
+	quote = line[i];
+	i++;
+	while (line[i])
+	{
+		if (line[i] == quote)
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
+char	*ft_cjoin(char *s1, char const c)
+{
+	size_t	i;
+	size_t	n;
+	char	*str;
+
+	if (!s1 || !c)
+		return (0);
+	i = 0;
+	n = 0;
+	str = malloc(ft_strlen(s1) + 2);
+	if (!str)
+		return (0);
+	while (s1[i] != 0)
+	{
+		str[i] = s1[i];
+		i++;
+	}
+	str[i] = c;
+	str[i + 1] = 0;
+	free(s1);
+	return (str);
+}
+
+char	*ft_expjoin(char *new, char *line, t_env *env)
+{
+	int		i;
+	char	*str;
+	char	*key;
+	t_env	*current;
+
+	i = 0;
+	current = env;
+	str = ft_strdup("");
+	key = ft_strdup("");
+	if (line[i] != '$')
+		str = ft_cjoin(new, line[i]);
+	else
+	{
+		i++;
+		while (line[i] && line[i] != ' ')
+			key = ft_cjoin(key, line[i++]);
+		while (current)
+		{
+			if (!ft_strcmp(key, current->key))
+			{
+				str = ft_strjoin(new, current->value);
+				break ;
+			}
+			current = current->next;
+		}
+	}
+	free(key);
+	return (str);
+}
+
+char	*de_quote(char *line, t_env *env)
+{
+	int		i;
+	char	*new;
+
+	i = 0;
+	new = ft_strdup("");
+	while (line[i])
+	{
+		if (line[i] == '\'' || line[i] == '"')
+		{
+			if (check_end_of_quotes(line + i))
+				break ;
+			if (line[i++] == '\'')
+				while (line[i] != '\'')
+					new = ft_cjoin(new, line[i++]);
+			else
+			{
+				while (line[i] && line[i] != '"')
+				{
+					if (line[i] == '$')
+					{
+						new = ft_expjoin(new, line + i++, env);
+						while (line[i] && (line[i] != ' ' || line[i] != '"'))
+							i++;
+					}
+					else
+						new = ft_expjoin(new, line + i++, env);
+				}
+			}
+			i++;
+		}
+		else
+		{
+			new = ft_expjoin(new, line + i++, env);
+			if (line[i] == '$')
+				while (line[i] && line[i] != ' ')
+					i++;
+		}
+	}
+	free(line);
+	return (new);
 }
 
 int	add_to_structs(t_minishell *minishell, char *line)
@@ -93,25 +186,25 @@ int	add_to_structs(t_minishell *minishell, char *line)
 	int		i;
 	int		n;
 	char	**pipeline;
-	char	**argline;
 
 	i = 0;
 	n = 0;
 	(void)minishell;
-//	minishell->cmds = init_cmds(minishell->cmds);
+	line = de_quote(line, minishell->env);
 	pipeline = ft_split(line, '|');
 	while (pipeline[n++])
 	{
 		while (line[i] && !(line[i] == '<' || line[i] == '>'))
 			i++;
-		if (line[i] == '<' || line[i] == '>')
+		if (line[i] && (line[i] == '<' || line[i] == '>'))
 			ft_putstr_fd("FOUND REDIR!!!\n", 1);
 		else
-			ft_putstr_fd("all guchi\n", 1);
-		while (pipeline[i])
-			free(pipeline[i++]);
-		free(pipeline);
+			minishell->cmds = add_cmds(pipeline);
 	}
+	i = 0;
+	while (pipeline[i])
+		free(pipeline[i++]);
+	free(pipeline);
 	return (0);
 }
 
@@ -184,8 +277,6 @@ t_minishell	*init_minishell(char **envp)
 	ft_bzero(minishell, sizeof(t_minishell));
 	minishell->env = init_env(envp);
 	minishell->cmds = 0;
-	minishell->cmd = 0;
-	minishell->arg = 0;
 	minishell->pipe = 0;
 	return (minishell);
 }
@@ -299,7 +390,7 @@ int	main(int ac, char **av, char **envp)
 			}
 			if (add_to_structs(minishell, line))
 				continue ;
-			//do_command(minishell);
+			do_command(minishell);
 			//free_cmds(minishell);
 		}
 	}
