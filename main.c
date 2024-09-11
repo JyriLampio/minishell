@@ -6,7 +6,7 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 10:36:37 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/11 17:54:50 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/11 18:25:10 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,15 +121,13 @@ char	*ft_expjoin(char *new, char *line, t_env *env)
 	else
 	{
 		i++;
-		while (line[i] && line[i] != ' ')
+		str = ft_strjoin(new, str);
+		while (line[i] && line[i] != ' ' && line[i] != '"')
 			key = ft_cjoin(key, line[i++]);
 		while (current)
 		{
 			if (!ft_strcmp(key, current->key))
-			{
-				str = ft_strjoin(new, current->value);
-				break ;
-			}
+				str = ft_strjoin(str, current->value);
 			current = current->next;
 		}
 	}
@@ -159,8 +157,10 @@ char	*de_quote(char *line, t_env *env)
 				{
 					if (line[i] == '$')
 					{
-						new = ft_expjoin(new, line + i++, env);
-						while (line[i] && (line[i] != ' ' || line[i] != '"'))
+						new = ft_expjoin(new, line + i, env);
+						while (line[i] && line[i] != ' ' && line[i] != '"')
+							i++;
+						if (line[i] == '"')
 							i++;
 					}
 					else
@@ -171,10 +171,12 @@ char	*de_quote(char *line, t_env *env)
 		}
 		else
 		{
-			new = ft_expjoin(new, line + i++, env);
-			if (line[i] == '$')
+			new = ft_expjoin(new, line + i, env);
+			if (line[i] && line[i] == '$')
 				while (line[i] && line[i] != ' ')
 					i++;
+			else
+				i++;
 		}
 	}
 	free(line);

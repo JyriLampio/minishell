@@ -6,13 +6,12 @@
 #    By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/16 11:05:56 by alogvine          #+#    #+#              #
-#    Updated: 2024/09/04 14:33:13 by alogvine         ###   ########.fr        #
+#    Updated: 2024/09/11 18:00:43 by alogvine         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 SRCS = main.c			\
 	   builtins.c		\
-	   parsing.c		\
 	   free.c
 
 OBJ = $(SRCS:.c=.o)

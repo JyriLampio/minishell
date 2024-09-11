@@ -6,7 +6,7 @@
 /*   By: alogvine <alogvine@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/04 14:31:39 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/04 14:32:36 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/11 18:00:59 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,5 +14,5 @@
 
 void	free_cmds(t_minishell *minishell)
 {
-	free(minishell->cmd);
+	free(minishell->cmds);
 }
