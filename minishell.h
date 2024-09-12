@@ -6,7 +6,7 @@
 /*   By: alogvine <alogvine@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 10:33:14 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/11 18:47:18 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/12 13:10:43 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ void	ft_putstr_fd(char *s, int fd);
 char	*ft_strchr(const char *s, int i);
 void	parsing_redirs(t_minishell *minishell, char *argline);
 void	ft_bzero(void *s, size_t n);
-void	free_cmds(t_minishell *minishell);
+void	free_cmds(t_cmds *cmds);
 size_t	ft_strlcat(char *dst, const char *src, size_t dstsize);
 
 #endif

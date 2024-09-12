@@ -6,13 +6,13 @@
 /*   By: alogvine <alogvine@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/04 14:31:39 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/11 18:00:59 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/12 14:28:44 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	free_cmds(t_minishell *minishell)
+void	free_cmds(t_cmds *cmds)
 {
-	free(minishell->cmds);
+	free(cmds);
 }

@@ -6,7 +6,7 @@
 /*   By: alogvine <alogvine@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 11:44:43 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/11 19:04:44 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/12 14:33:43 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,22 +53,22 @@ void	check_builtins(t_minishell *minishell)
 	while (curr)
 	{
 		printf("CMD: %s\nARG: %s\n", curr->cmd, curr->arg);
+		if (!ft_strcmp("echo", curr->cmd))
+			cmd_echo(minishell->cmds);
+		else if (!ft_strcmp("cd", curr->cmd))
+			printf("BUILTIN: CD\n");
+		else if (!ft_strcmp("pwd", curr->cmd))
+			printf("BUILTIN: PWD\n");
+		else if (!ft_strcmp("export", curr->cmd))
+			printf("BUILTIN: export\n");
+		else if (!ft_strcmp("unset", curr->cmd))
+			printf("BUILTIN: UNSET\n");
+		else if (!ft_strcmp("env", curr->cmd))
+			print_env(minishell->env);
+		else if (!ft_strcmp("exit", curr->cmd))
+			free_and_exit(minishell);
+		else
+			ft_putstr_fd("Checking execve...\n", 1);
 		curr = curr->next;
 	}
-	if (!ft_strcmp("echo", cmds->cmd))
-		cmd_echo(minishell->cmds);
-	else if (!ft_strcmp("cd", cmds->cmd))
-		printf("BUILTIN: CD\n");
-	else if (!ft_strcmp("pwd", cmds->cmd))
-		printf("BUILTIN: PWD\n");
-	else if (!ft_strcmp("export", cmds->cmd))
-		printf("BUILTIN: export\n");
-	else if (!ft_strcmp("unset", cmds->cmd))
-		printf("BUILTIN: UNSET\n");
-	else if (!ft_strcmp("env", cmds->cmd))
-		print_env(minishell->env);
-	else if (!ft_strcmp("exit", cmds->cmd))
-		free_and_exit(minishell);
-	else
-		ft_putstr_fd("Checking execve...\n", 1);
 }

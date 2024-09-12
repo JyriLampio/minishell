@@ -6,13 +6,15 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 10:36:37 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/11 18:55:24 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/12 14:48:28 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-t_cmds	*create_cmd(char *pipeline)
+char	*de_quote(char *line, t_env *env);
+
+t_cmds	*create_cmd(char *pipeline, t_env *env)
 {
 	t_cmds	*new;
 	char	*temp;
@@ -25,13 +27,14 @@ t_cmds	*create_cmd(char *pipeline)
 		return (0);
 	argline = ft_split(pipeline, ' ');
 	arg = ft_strdup("");
-	new->cmd = ft_strdup(argline[0]);
+	new->cmd = ft_strdup(de_quote(argline[0], env));
+	if (!new->cmd[0])
+		return (0);
 	i = 1;
 	while (argline[i])
 	{
 		temp = arg;
-		arg = ft_strjoin(arg, argline[i]);
-		i++;
+		arg = ft_strjoin(arg, argline[i++]);
 		if (argline[i])
 			arg = ft_strjoin(arg, " ");
 		free(temp);
@@ -41,25 +44,29 @@ t_cmds	*create_cmd(char *pipeline)
 	return (new);
 }
 
-t_cmds	*add_cmds(char **pipeline)
+t_cmds	*add_cmds(char *pipeline, t_minishell *minishell)
 {
 	t_cmds	*cmds;
 	t_cmds	*current;
 	t_cmds	*new;
-	int		i;
 
-	i = 0;
-	while (pipeline[i])
+	current = 0;
+	cmds = minishell->cmds;
+	printf("PIPELINE: %s\n", pipeline);
+	if (pipeline[0])
 	{
-		new = create_cmd(pipeline[i]);
+		new = create_cmd(pipeline, minishell->env);
 		if (!new)
 			return (0);
-		if (i == 0)
+		if (!cmds)
 			cmds = new;
 		else if (current)
+		{
+			while (current->next)
+				current = current->next;
 			current->next = new;
+		}
 		current = new;
-		i++;
 	}
 	return (cmds);
 }
@@ -148,7 +155,8 @@ char	*de_quote(char *line, t_env *env)
 			if (check_end_of_quotes(line + i))
 			{
 				ft_putstr_fd("GIT GUD!\n", 1);
-				return (0);
+				free(line);
+				return ("");
 			}
 			if (line[i++] == '\'')
 				while (line[i] != '\'')
@@ -193,19 +201,18 @@ int	add_to_structs(t_minishell *minishell, char *line)
 
 	i = 0;
 	n = 0;
-	(void)minishell;
-	line = de_quote(line, minishell->env);
 	if (!line)
 		return (1);
 	pipeline = ft_split(line, '|');
-	while (pipeline[n++])
+	printf("PIPE AFTER SPLIT: %s\n", pipeline[n]);
+	while (pipeline[n])
 	{
 		while (line[i] && !(line[i] == '<' || line[i] == '>'))
 			i++;
 		if (line[i] && (line[i] == '<' || line[i] == '>'))
 			ft_putstr_fd("FOUND REDIR!!!\n", 1);
 		else
-			minishell->cmds = add_cmds(pipeline);
+			minishell->cmds = add_cmds(pipeline[n++], minishell);
 	}
 	i = 0;
 	while (pipeline[i])
@@ -292,16 +299,16 @@ int	check_quotes(char *line)
 	int	i;
 
 	i = 0;
-	if (line[i] && line[i] == 34)
+	if (line[i] && line[i] == '\'')
 	{
 		i++;
-		while (line[i] && line[i] != 34)
+		while (line[i] && line[i] != '\'')
 			i++;
 	}
-	else if (line[i] && line[i] == 39)
+	else if (line[i] && line[i] == '"')
 	{
 		i++;
-		while (line[i] && line[i] != 39)
+		while (line[i] && line[i] != '"')
 			i++;
 	}
 	return (i);
@@ -317,29 +324,23 @@ int	check_double(char *line)
 		i += check_quotes(line + i);
 		if (line[i] && line[i] == '|')
 		{
-			if (line[i + 1] == '|')
+			if (line[i++ + 1] == '|')
 				return (1);
-			i++;
+			if (line[i] == '&')
+				i++;
 			while (line[i] && line[i] == ' ')
 				i++;
-			if (line[i] && (line[i] == '|' || line[i] == '&'))
-			{
-				printf("minishell: syntax error near unexpected token `%c'\n", line[i]);
+			if (line[i] && (line[i] == '|'))
 				return (2);
-			}
 		}
 		else if (line[i] && line [i] == '&')
 		{
-			if (line[i + 1] == '&')
+			if (line[i++ + 1] == '&')
 				return (1);
-			i++;
 			while (line[i] && line[i] == ' ')
 				i++;
 			if (line[i] && (line[i] == '&' || line[i] == '|'))
-			{
-				printf("minishell: syntax error near unexpected token `%c'\n", line[i]);
 				return (2);
-			}
 		}
 	}
 	return (0);
@@ -369,6 +370,8 @@ int	check_syntax(char *line)
 		if (t == 1)
 			ft_putstr_fd("Command not avalaible, \
 please purchase premium for $420,69\n", 1);
+		if (t == 2)
+			ft_putstr_fd("Syntax error\n", 1);
 		return (1);
 	}
 	if (!check_empty(line))
@@ -397,7 +400,8 @@ int	main(int ac, char **av, char **envp)
 			if (add_to_structs(minishell, line))
 				continue ;
 			do_command(minishell);
-			//free_cmds(minishell);
+			free_cmds(minishell->cmds);
+			minishell->cmds = 0;
 		}
 	}
 	return (0);
