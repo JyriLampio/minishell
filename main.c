@@ -6,7 +6,7 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 10:36:37 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/16 16:15:04 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/16 16:39:18 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,7 @@ t_args	*create_args(char **args, t_env *env)
 	int		i;
 
 	i = 1;
+	targs = 0;
 	while (args[i])
 	{
 		new = create_arg(args[i], env);
@@ -92,8 +93,9 @@ t_cmds	*create_cmd(char *pipeline, t_env *env)
 	args = pipesplit(pipeline, ' ');
 	if (!args)
 		return (0);
-	new->cmd = ft_strdup(args[0]);
+	new->cmd = ft_strdup(de_quote(args[0], env));
 	new->args = create_args(args, env);
+	new->next = 0;
 	return (new);
 }
 
@@ -118,7 +120,6 @@ t_cmds	*create_cmds(char *pipeline, t_minishell *minishell)
 		}
 		current = new;
 	}
-	current->next = 0;
 	return (minishell->cmds);
 }
 
@@ -258,7 +259,7 @@ int	add_to_structs(t_minishell *minishell, char *line)
 	pipeline = pipesplit(line, '|');
 	while (pipeline[n])
 	{
-		printf("PIPE AFTER SPLIT: %s\n", pipeline[n]);
+//		printf("PIPE AFTER SPLIT: %s\n", pipeline[n]);
 		while (line[i] && !(line[i] == '<' || line[i] == '>'))
 			i++;
 		if (line[i] && (line[i] == '<' || line[i] == '>'))

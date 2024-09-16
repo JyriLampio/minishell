@@ -6,7 +6,7 @@
 /*   By: alogvine <alogvine@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 11:44:43 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/16 16:18:43 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/16 16:33:20 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,12 +71,9 @@ char	**arr_args(t_args *args)
 		return (0);
 	str[i] = 0;
 	i = 0;
-	if (args)
-		printf("ARGS TO EXIST!!!\n");
 	while (args)
 	{
 		str[i++] = ft_strdup(args->arg);
-		printf("ARG ADDED:%s\n", args->arg);
 		args = args->next;
 	}
 	return (str);
@@ -89,7 +86,7 @@ void	check_builtins(t_minishell *minishell)
 	cmds = minishell->cmds;
 	while (cmds)
 	{
-		printf("CMD: %s\n", cmds->cmd);
+//		printf("CMD: %s\n", cmds->cmd);
 		if (!ft_strcmp("echo", cmds->cmd))
 			cmd_echo(arr_args(cmds->args));
 		else if (!ft_strcmp("cd", cmds->cmd))

@@ -6,7 +6,7 @@
 /*   By: alogvine <alogvine@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/16 11:15:50 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/16 15:08:15 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/16 16:27:33 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,6 @@ char	**pipesplit(char *line, char c)
 	if (!line)
 		return (0);
 	i = count_pipes(line, c);
-//	printf("AMOUNT OF CMD LINES: %d\nLINE: %s\n", i, line);
 	str = malloc(sizeof(str) * (i + 1));
 	if (!str)
 		return (0);
