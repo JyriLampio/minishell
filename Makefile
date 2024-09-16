@@ -6,13 +6,14 @@
 #    By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/16 11:05:56 by alogvine          #+#    #+#              #
-#    Updated: 2024/09/11 18:00:43 by alogvine         ###   ########.fr        #
+#    Updated: 2024/09/16 11:21:51 by alogvine         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 SRCS = main.c			\
 	   builtins.c		\
-	   free.c
+	   free.c			\
+	   pipesplit.c
 
 OBJ = $(SRCS:.c=.o)
 

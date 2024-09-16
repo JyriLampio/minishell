@@ -6,7 +6,7 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 10:36:37 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/12 14:48:28 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/16 16:15:04 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 char	*de_quote(char *line, t_env *env);
 
-t_cmds	*create_cmd(char *pipeline, t_env *env)
+/*t_cmds	*create_cmd(char *pipeline, t_env *env)
 {
 	t_cmds	*new;
 	char	*temp;
@@ -22,7 +22,7 @@ t_cmds	*create_cmd(char *pipeline, t_env *env)
 	char	**argline;
 	int		i;
 
-	new = malloc(sizeof(t_env));
+	new = malloc(sizeof(t_cmds));
 	if (!new)
 		return (0);
 	argline = ft_split(pipeline, ' ');
@@ -33,33 +33,83 @@ t_cmds	*create_cmd(char *pipeline, t_env *env)
 	i = 1;
 	while (argline[i])
 	{
+
 		temp = arg;
 		arg = ft_strjoin(arg, argline[i++]);
 		if (argline[i])
 			arg = ft_strjoin(arg, " ");
 		free(temp);
 	}
-	new->arg = arg;
+	new->arg = de_quote(arg, env);
+	new->next = 0;
+	return (new);
+}*/
+
+t_args	*create_arg(char *arg, t_env *env)
+{
+	t_args	*new;
+
+	new = malloc(sizeof(t_args));
+	if (!new)
+		return (0);
+	new->arg = ft_strdup(de_quote(arg, env));
 	new->next = 0;
 	return (new);
 }
 
-t_cmds	*add_cmds(char *pipeline, t_minishell *minishell)
+t_args	*create_args(char **args, t_env *env)
 {
-	t_cmds	*cmds;
+	t_args	*targs;
+	t_args	*new;
+	t_args	*curr;
+	int		i;
+
+	i = 1;
+	while (args[i])
+	{
+		new = create_arg(args[i], env);
+		if (!new)
+			return (0);
+		if (i == 1)
+			targs = new;
+		else if (curr)
+			curr->next = new;
+		curr = new;
+		i++;
+	}
+	curr->next = 0;
+	return (targs);
+}
+
+t_cmds	*create_cmd(char *pipeline, t_env *env)
+{
+	t_cmds	*new;
+	char	**args;
+
+	new = malloc(sizeof(t_cmds));
+	if (!new)
+		return (0);
+	args = pipesplit(pipeline, ' ');
+	if (!args)
+		return (0);
+	new->cmd = ft_strdup(args[0]);
+	new->args = create_args(args, env);
+	return (new);
+}
+
+t_cmds	*create_cmds(char *pipeline, t_minishell *minishell)
+{
 	t_cmds	*current;
 	t_cmds	*new;
 
-	current = 0;
-	cmds = minishell->cmds;
-	printf("PIPELINE: %s\n", pipeline);
-	if (pipeline[0])
+	current = minishell->cmds;
+	if (pipeline)
 	{
 		new = create_cmd(pipeline, minishell->env);
 		if (!new)
 			return (0);
-		if (!cmds)
-			cmds = new;
+		if (!minishell->cmds)
+			minishell->cmds = new;
 		else if (current)
 		{
 			while (current->next)
@@ -68,7 +118,8 @@ t_cmds	*add_cmds(char *pipeline, t_minishell *minishell)
 		}
 		current = new;
 	}
-	return (cmds);
+	current->next = 0;
+	return (minishell->cmds);
 }
 
 int	check_end_of_quotes(char *line)
@@ -114,29 +165,30 @@ char	*ft_cjoin(char *s1, char const c)
 
 char	*ft_expjoin(char *new, char *line, t_env *env)
 {
-	int		i;
 	char	*str;
 	char	*key;
-	t_env	*current;
 
-	i = 0;
-	current = env;
 	str = ft_strdup("");
 	key = ft_strdup("");
-	if (line[i] != '$')
-		str = ft_cjoin(new, line[i]);
-	else if (line[i++])
+	if (*line == '$')
 	{
-		str = ft_strjoin(new, str);
-		while (line[i] && line[i] != ' ' && line[i] != '"')
-			key = ft_cjoin(key, line[i++]);
-		while (current)
+		if (*line == '$' && *line + 1 == '"')
+			str = ft_cjoin(new, '$');
+		else if (*line++)
 		{
-			if (!ft_strcmp(key, current->key))
-				str = ft_strjoin(str, current->value);
-			current = current->next;
+			str = ft_strjoin(new, str);
+			while (*line && *line != ' ' && *line != '"')
+				key = ft_cjoin(key, *line++);
+			while (env)
+			{
+				if (!ft_strcmp(key, env->key))
+					str = ft_strjoin(str, env->value);
+				env = env->next;
+			}
 		}
 	}
+	else
+		str = ft_cjoin(new, *line);
 	free(key);
 	return (str);
 }
@@ -203,17 +255,22 @@ int	add_to_structs(t_minishell *minishell, char *line)
 	n = 0;
 	if (!line)
 		return (1);
-	pipeline = ft_split(line, '|');
-	printf("PIPE AFTER SPLIT: %s\n", pipeline[n]);
+	pipeline = pipesplit(line, '|');
 	while (pipeline[n])
 	{
+		printf("PIPE AFTER SPLIT: %s\n", pipeline[n]);
 		while (line[i] && !(line[i] == '<' || line[i] == '>'))
 			i++;
 		if (line[i] && (line[i] == '<' || line[i] == '>'))
 			ft_putstr_fd("FOUND REDIR!!!\n", 1);
 		else
-			minishell->cmds = add_cmds(pipeline[n++], minishell);
+			minishell->cmds = create_cmds(pipeline[n++], minishell);
 	}
+//	while (minishell->cmds)
+//	{
+//		printf("COMMAND: %s\nARGUMENT:\n", minishell->cmds->cmd);//, minishell->cmds->args->arg);
+//		minishell->cmds = minishell->cmds->next;
+//	}
 	i = 0;
 	while (pipeline[i])
 		free(pipeline[i++]);

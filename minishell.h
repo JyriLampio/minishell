@@ -6,7 +6,7 @@
 /*   By: alogvine <alogvine@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 10:33:14 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/12 13:10:43 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/16 14:14:24 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,17 @@ typedef struct s_env
 	struct s_env	*next;
 }		t_env;
 
+typedef struct	s_args
+{
+	char			*arg;
+	struct s_args	*next;
+}		t_args;
+
 typedef struct s_cmds
 {
 	char			*cmd;
 	char			*arg;
+	t_args			*args;
 //	bool			pipe;
 	struct s_cmds	*next;
 }		t_cmds;
@@ -55,5 +62,7 @@ void	parsing_redirs(t_minishell *minishell, char *argline);
 void	ft_bzero(void *s, size_t n);
 void	free_cmds(t_cmds *cmds);
 size_t	ft_strlcat(char *dst, const char *src, size_t dstsize);
+char    **pipesplit(char *line, char c);
+int		freestr(char **str);
 
 #endif
