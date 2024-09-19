@@ -6,64 +6,51 @@
 /*   By: alogvine <alogvine@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/29 14:29:48 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/04 15:26:09 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/19 17:39:04 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	find_cmd(t_minishell *minishell, char *argline)
+int	check_redirs(char *line)
 {
-	int	i;
-
-	i = 0;
-	while (argline[i])
+	while (*line)
 	{
-		if (argline[i] == '<' || argline[i] == '>')
-		{
-			minishell->cmd = ft_strdup(argline);
-			printf("%s\n", minishell->cmd);
-		}
-		i++;
+		if (*line == '\'' || *line == '"')
+			line += qlen(line, *line);
+		else if (*line == '<' || *line == '>')
+			return (1);
+		else
+			line++;
 	}
+	return (0);
 }
 
-void	parsing_redirs(t_minishell *minishell, char *argline)
+char	*parse_cmd(char *line)
 {
-	int	i;
+	char	*new;
 
-	i = 0;
-	minishell->cmd = 0;
-//	find_cmd(minishell, argline);
-	while (argline[i++])
+	new = ft_strdup("");
+	while (*line)
 	{
-//		printf("I DO BE HERE\nline: %s\n", argline);
-		if (argline[i] == '<' && argline[i + 1] && argline[i + 1] == '<')
-		{
-			printf("HeH?\n");
-			minishell->cmd = ft_strdup("<<");
-			minishell->arg = 0;
-			break ;
-		}
-		else if (argline[i] == '>' && argline[i + 1] && argline[i + 1] == '>')
-		{
-			printf("HUH?\n");
-			minishell->cmd = ft_strdup(">>");
-			minishell->arg = 0;
-			break ;
-		}
-		else if (argline[i] == '<')
-		{
-			minishell->cmd = ft_strdup("<");
-			minishell->arg = 0;
-			break ;
-		}
-		else if (argline[i] == '>')
-		{
-			minishell->cmd = ft_strdup(">");
-			minishell->arg = 0;
-			break ;
-		}
+		if(*line == ' ')
+			line += qlen(line, *line);
+		else if (*line == '\'' || *line == '"')
+			line += qlen(line, *line);
+		else if (*line != '<' || *line != '>')
+			while (*line != ' ' || *line != '<' || *line != '>')
+				ft_cjoin(new, *line++);
 	}
-	printf("REDIR CMD: %s\n", minishell->cmd);
+	return (new);
+}
+
+int	parse_redirs(char *line, t_minishell *minishell)
+{
+	char	*new;
+
+	(void)minishell;
+	new = parse_cmd(line);
+//	new = parse_arg(line);
+	printf("CMD IN REDIRLINE: %s\n", new);
+	return (1);
 }

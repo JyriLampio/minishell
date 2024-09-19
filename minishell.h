@@ -6,7 +6,7 @@
 /*   By: alogvine <alogvine@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 10:33:14 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/16 14:14:24 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/19 16:56:43 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ typedef struct s_env
 	struct s_env	*next;
 }		t_env;
 
-typedef struct	s_args
+typedef struct s_args
 {
 	char			*arg;
 	struct s_args	*next;
@@ -34,9 +34,8 @@ typedef struct	s_args
 typedef struct s_cmds
 {
 	char			*cmd;
-	char			*arg;
 	t_args			*args;
-//	bool			pipe;
+	int				pipe;
 	struct s_cmds	*next;
 }		t_cmds;
 
@@ -44,7 +43,6 @@ typedef struct s_minishell
 {
 	t_env	*env;
 	t_cmds	*cmds;
-	int		pipe;
 }		t_minishell;
 
 char	**ft_split(char const *s, char c);
@@ -55,14 +53,21 @@ char	*ft_strjoin(char *s1, char *s2);
 void	*ft_memset(void *b, int i, size_t n);
 char	*ft_strdup(const char *s);
 int		ft_strcmp(const char *s1, const char *s2);
-void	check_builtins(t_minishell *minishell);
+int		check_builtins(t_minishell *minishell);
 void	ft_putstr_fd(char *s, int fd);
 char	*ft_strchr(const char *s, int i);
 void	parsing_redirs(t_minishell *minishell, char *argline);
 void	ft_bzero(void *s, size_t n);
-void	free_cmds(t_cmds *cmds);
+void	freecmds(t_cmds *cmds);
 size_t	ft_strlcat(char *dst, const char *src, size_t dstsize);
-char    **pipesplit(char *line, char c);
-int		freestr(char **str);
+char	**pipesplit(char *line, char c);
+char	**freestr(char **str);
+char	*expand(char *str, t_minishell *minishell);
+int		qlen(char *line, char c);
+int		check_redirs(char *line);
+int		parse_redirs(char *line, t_minishell *minishell);
+void	freeminishell(t_minishell *minishell);
+void	freeenv(t_env *env);
+char	*ft_cjoin(char *s1, char c);
 
 #endif
