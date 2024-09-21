@@ -6,7 +6,7 @@
 /*   By: alogvine <alogvine@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/04 14:31:39 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/19 18:06:25 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/21 17:50:41 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,25 @@ void	freeargs(t_args *args)
 	}
 }
 
+void	freeredirs(t_redirs *redirs)
+{
+	t_redirs	*curr;
+	t_redirs	*temp;
+
+	curr = redirs;
+	while (curr)
+	{
+		temp = curr;
+		free(redirs->file);
+		curr = curr->next;
+		free(temp);
+	}
+}
+
 void	freecmds(t_cmds *cmds)
 {
-	t_cmds *curr;
-	t_cmds *temp;
+	t_cmds	*curr;
+	t_cmds	*temp;
 
 	freeargs(cmds->args);
 	curr = cmds;
@@ -38,6 +53,8 @@ void	freecmds(t_cmds *cmds)
 	{
 		temp = curr;
 		free(curr->cmd);
+		if (curr->redirs)
+			freeredirs(curr->redirs);
 		curr = curr->next;
 		free(temp);
 	}
@@ -45,16 +62,15 @@ void	freecmds(t_cmds *cmds)
 
 void	freeenv(t_env *env)
 {
-	t_env *curr;
-	t_env *temp;
+	t_env	*temp;
 
-	curr = env;
-	while (curr)
+	temp = env;
+	while (env)
 	{
-		temp = curr;
-		free(curr->key);
-		free(curr->value);
-		curr = curr->next;
+		temp = env;
+		free(env->key);
+		free(env->value);
+		env = env->next;
 		free(temp);
 	}
 }
@@ -69,4 +85,5 @@ void	freeminishell(t_minishell *minishell)
 			freecmds(minishell->cmds);
 		free(minishell);
 	}
+//	rl_clear_history();
 }

@@ -6,7 +6,7 @@
 #    By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/16 11:05:56 by alogvine          #+#    #+#              #
-#    Updated: 2024/09/19 11:59:32 by alogvine         ###   ########.fr        #
+#    Updated: 2024/09/21 21:52:46 by alogvine         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,7 +22,7 @@ LIBFT = libft/libft.a
 LIBFT_DIR = libft/
 
 CC = cc
-CFLAGS = -Wall -Werror -Wextra -g
+CFLAGS = -Wall -Werror -Wextra -g #-fsanitize=address
 LDFLAGS = -L$(LIBFT_DIR) -lft
 
 NAME = minishell

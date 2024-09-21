@@ -6,7 +6,7 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 10:36:37 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/19 18:48:54 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/21 21:52:12 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ t_args	*create_arg(char *arg, t_minishell *minishell)
 	new = malloc(sizeof(t_args));
 	if (!new)
 		return (0);
-	new->arg = ft_strdup(expand(arg, minishell));
+	new->arg = expand(arg, minishell);
 	new->next = 0;
 	return (new);
 }
@@ -45,23 +45,80 @@ t_args	*create_args(t_args *targ, char *args, t_minishell *minishell)
 	return (targ);
 }
 
-t_cmds	*create_cmd(char *pipeline, t_minishell *minishell, int pipe)
+t_redir_type	fetch_redir(char *redir)
+{
+	if (*redir && *(redir + 1) && *redir == '<' && *(redir + 1) == '<')
+		return (REDIR_HEREDOC);
+	if (*redir && *(redir + 1) && *redir == '>' && *(redir + 1) == '>')
+		return (REDIR_APPEND);
+	if (*redir && *redir == '<')
+		return (REDIR_IN);
+	if (*redir && *redir == '>')
+		return (REDIR_OUT);
+	return (0);
+}
+
+t_redirs	*create_redir(char *redir, char *file, t_minishell *minishell)
+{
+	t_redirs	*new;
+
+	new = malloc(sizeof(t_redirs));
+	if (!new)
+		return (0);
+	new->type = fetch_redir(redir);
+	new->file = expand(file, minishell);
+	new->next = 0;
+	return (new);
+}
+
+t_redirs	*create_redirs(t_redirs *redirs, char *redir,
+		char *file, t_minishell *minishell)
+{
+	t_redirs	*new;
+	t_redirs	*curr;
+
+	curr = redirs;
+	new = create_redir(redir, file, minishell);
+	if (!new)
+		return (0);
+	if (redirs == 0)
+		redirs = new;
+	else if (curr)
+	{
+		while (curr->next)
+			curr = curr->next;
+		curr->next = new;
+	}
+	curr = new;
+	return (redirs);
+}
+
+t_cmds	*create_cmd(char *pipeline, t_minishell *minishell, int redir)
 {
 	t_cmds	*new;
 	char	**args;
+	char	**temp;
 
 	new = malloc(sizeof(t_cmds));
 	if (!new)
 		return (0);
 	args = pipesplit(pipeline, ' ');
-	if (!args)
+	if (!args || !*args)
 		return (0);
+	temp = args;
 	new->args = 0;
-	new->cmd = ft_strdup(expand(*args++, minishell));
-	while (*args)
+	new->redirs = 0;
+	if (*args && *args[0] != '<' && *args[0] != '>')
+		new->cmd = expand(*args++, minishell);
+	while (*args && *args[0] != '<' && *args[0] != '>')
 		new->args = create_args(new->args, *args++, minishell);
+	while (redir == 1 && *args)
+	{
+		new->redirs = create_redirs(new->redirs, *args, *(args + 1), minishell);
+		args += 2;
+	}
 	new->next = 0;
-	new->pipe = pipe;
+	freestr(temp);
 	return (new);
 }
 
@@ -89,23 +146,6 @@ t_cmds	*create_cmds(char *pipeline, t_minishell *minishell, int pipe)
 	return (minishell->cmds);
 }
 
-int	check_end_of_quotes(char *line)
-{
-	int		i;
-	char	quote;
-
-	i = 0;
-	quote = line[i];
-	i++;
-	while (line[i])
-	{
-		if (line[i] == quote)
-			return (0);
-		i++;
-	}
-	return (1);
-}
-
 char	*ft_cjoin(char *s1, char c)
 {
 	size_t	i;
@@ -124,83 +164,54 @@ char	*ft_cjoin(char *s1, char c)
 	}
 	str[i] = c;
 	str[i + 1] = 0;
+	free(s1);
 	return (str);
 }
 
 char	*ft_expjoin(char *new, char *line, t_env *env)
 {
-	char	*str;
 	char	*key;
+	char	*temp;
 
-	str = ft_strdup("");
+	temp = new;
 	key = ft_strdup("");
-	if (*line == '$')
+	if (!key)
+		return (0);
+	if (new && *line == '$')
 	{
 		line++;
-		str = ft_strjoin(str, new);
-		while (*line && *line != ' ' && *line != '"')
+		while (key && *line && *line != ' ' && *line != '"' && *line != '\'')
 			key = ft_cjoin(key, *line++);
-		while (env)
+		while (new && key && env)
 		{
 			if (!ft_strcmp(key, env->key))
-				str = ft_strjoin(str, env->value);
+				new = ft_strjoin(new, env->value);
 			env = env->next;
 		}
 	}
-	else
-		str = ft_cjoin(new, *line);
+	else if (key && new)
+		new = ft_cjoin(new, *line);
 	free(key);
-	return (str);
-}
-
-char	*ft_expqjoin(char *new, char *line, t_env *env)
-{
-	char	*key;
-
-	key = ft_strdup("");
-	line += 2;
-	while (*line && *line != ' ' && *line != '"')
-		key = ft_cjoin(key, *line++);
-	while (env)
-	{
-		if (!ft_strcmp(key, env->key))
-			new = ft_strjoin(new, env->value);
-		env = env->next;
-	}
-	free(key);
+	free(temp);
 	return (new);
 }
 
-char	*qjoin(char	*str)
+char	*qexpand(char *new, char *line, t_minishell *minishell)
 {
-	char	*new;
-
-	new = ft_strdup("");
-	new = ft_cjoin(new, *str++);
-	while (*str != '\'')
-		new = ft_cjoin(new, *str++);
-	new = ft_cjoin(new, *str);
-	return (new);
-}
-
-char	*qexpand(char *line, t_minishell *minishell)
-{
-	char	*new;
-
-	new = ft_strdup("");
 	line++;
 	while (new && *line && *line != '"')
 	{
-		if (*line == '$' && (*(line + 1) == '"' || *(line + 1) == ' ' || !*(line + 1)))
+		if (new && *line == '$' && (*(line + 1) == '"'
+				|| *(line + 1) == ' ' || !*(line + 1)))
 			new = ft_cjoin(new, *line++);
-		else if (*line == '$' && *(line + 1) == '?')
+		else if (new && *line == '$' && *(line + 1) == '?')
 			printf("???????????????\n");
-		else if (*line == '$' && *(line + 1) == '\'')
+		else if (new && *line == '$' && *(line + 1) == '\'')
 			new = ft_cjoin(new, *line);
-		else if (*line == '$')
+		else if (new && *line == '$')
 		{
 			new = ft_expjoin(new, line, minishell->env);
-			line += qlen(line, ' ') - 1;
+			line += dlen(line);
 		}
 		else
 			new = ft_cjoin(new, *line++);
@@ -216,21 +227,30 @@ char	*noexpand(char *new, char *line)
 	return (new);
 }
 
-char	*expandx(char *line, t_minishell *minishell)
+char	*dexpand(char *new, char *line, t_minishell *minishell)
 {
-	char	*new;
-
-	new = ft_strdup("");
-	if (new && *line == '$' && *(line + 1) && *(line + 1) == ' ')
-		new = ft_cjoin(new, *line++);
-	else if ((*(line + 1) && *(line + 1) == '?')
-		|| (*(line + 1) == '"' && *(line + 2) == '?'))
+	if (new && (!*(line + 1) || *(line + 1) == ' '))
+		new = ft_cjoin(new, '$');
+	else if (new && *(line + 1) && (*(line + 1) == '"' || *(line + 1) == '\''))
+		line++;
+	else if (new && *(line + 1) && *(line + 1) == '?')
 		printf("??????????????\n");
-	else if (*(line + 1) && *(line + 1) == '"')
-		new = ft_expqjoin(new, line, minishell->env);
-	else
-		new = ft_expjoin(new, line++, minishell->env);
+	else if (new && *line)
+		new = ft_expjoin(new, line, minishell->env);
 	return (new);
+}
+
+int	dlen(char *line)
+{
+	int	i;
+
+	i = 0;
+	while (*line && *line != ' ' && *line != '\'' && *line != '"')
+	{
+		line++;
+		i++;
+	}
+	return (i);
 }
 
 char	*expand(char *line, t_minishell *minishell)
@@ -247,16 +267,14 @@ char	*expand(char *line, t_minishell *minishell)
 		}
 		else if (*line == '"')
 		{
-			new = ft_strjoin(new, qexpand(line, minishell));
-			line += qlen(line, '"');
+			new = qexpand(new, line, minishell);
+			line += qlen(line, *line);
 		}
-		else if (*line == '$' && *(line + 1) && *(line + 1) != '\'' && *(line + 1) != ' ')
+		else if (*line == '$')
 		{
-			new = ft_strjoin(new, expandx(line, minishell));
-			line += qlen(line, ' ') - 1;
+			new = dexpand(new, line, minishell);
+			line += dlen(line);
 		}
-		else if (*line == '$' && *(line + 1) == '\'')
-			new = ft_cjoin(new, *line++);
 		else
 			new = ft_cjoin(new, *line++);
 	}
@@ -268,6 +286,7 @@ int	add_to_structs(char *line, t_minishell *minishell)
 	int		i;
 	int		n;
 	char	**pipeline;
+	char	*redirline;
 
 	i = 0;
 	n = 0;
@@ -278,13 +297,13 @@ int	add_to_structs(char *line, t_minishell *minishell)
 	{
 		if (check_redirs(pipeline[n]))
 		{
-			if (parse_redirs(pipeline[n++], minishell))
-				return (1);
-			printf("DO NOT PRINT THIS!!!!!!\n");
+			redirline = parse_redirs(pipeline[n++]);
+			minishell->cmds = create_cmds(redirline, minishell, 1);
 		}
 		else
 			minishell->cmds = create_cmds(pipeline[n++], minishell, 0);
 	}
+	//free(redirline);
 	freestr(pipeline);
 	return (0);
 }
@@ -319,6 +338,26 @@ t_env	*create_node(char *key, char *value)
 	return (new);
 }
 
+void	set_shlvl(t_env *env)
+{
+	int		check;
+
+	check = 0;
+	while (env)
+	{
+		if (!ft_strcmp(env->key, "SHLVL"))
+		{
+			check = 1;
+			break ;
+		}
+		env = env->next;
+	}
+	if (check)
+		env->value = ft_itoa(ft_atoi(env->value) + 1);
+	else
+		env = create_node("SHLVL", "1");
+}
+
 t_env	*init_env(char **envp)
 {
 	t_env	*env;
@@ -344,6 +383,7 @@ t_env	*init_env(char **envp)
 		current = new;
 		i++;
 	}
+	set_shlvl(env);
 	return (env);
 }
 
@@ -386,38 +426,41 @@ int	check_quotes(char *line)
 
 int	check_double(char *line)
 {
-	while (*line)
+	int	i;
+
+	i = 0;
+	while (line[i])
 	{
-		while (*line == '\'' || *line == '"')
-			line += qlen(line, *line);
-		if (*line && (*line == '|' || *line == '&'))
+		while (line[i] && (line[i] == '\'' || line[i] == '"'))
+			i += qlen(line, line[i]);
+		if (line[i] && (line[i] == '|' || line[i] == '&'))
 		{
-			if (*line == '|' && *(line + 1) == '|')
+			if (line[i] == '|' && line[i + 1] == '|')
 				return (1);
-			else if (*line == '&' && *(line + 1) == '&')
+			else if (line[i] == '&' && line[i + 1] == '&')
 				return (1);
-			line++;
-			while (*line && *line == ' ')
-				line++;
-			if (*line && (*line == '|' || *line == '&'))
-				return (2);
+			i++;
+			while (line[i] && line[i] == ' ')
+				i++;
+			if (line[i] && (line[i] == '|' || line[i] == '&'))
+				return (i);
 		}
-		else
-			line++;
+		else if (line[i])
+			i++;
 	}
 	return (0);
 }
 
 int	check_empty(char *line)
 {
-	int	i;
-
-	i = 0;
-	while (line[i])
+	while (*line && *line == ' ')
+		line++;
+	if (!*line)
+		return (1);
+	else if (*line == '|')
 	{
-		if (line[i] != ' ')
-			return (1);
-		i++;
+		printf("bobershell: syntax error near unexpected token '%c'\n", *line);
+		return (1);
 	}
 	return (0);
 }
@@ -426,19 +469,24 @@ int	check_syntax(char *line)
 {
 	int	t;
 
-	if (!check_empty(line))
+	if (check_empty(line))
 		return (1);
 	if (check_quotes(line))
+		t = 2;
+	else if (redir_syntax(line))
 		t = 2;
 	else
 		t = check_double(line);
 	if (t > 0)
 	{
 		if (t == 1)
-			ft_putstr_fd("Command not avalaible, \
+			ft_putstr_fd("Command not available, \
 please purchase premium for $420,69\n", 1);
-		if (t == 2)
+		else if (t == 2)
 			ft_putstr_fd("Syntax error\n", 1);
+		else if (t > 1)
+			printf("bobershell: syntax error \
+near unexpected token '%c'\n", line[t]);
 		return (1);
 	}
 	return (0);
@@ -455,19 +503,23 @@ int	main(int ac, char **av, char **envp)
 	while (1)
 	{
 		line = readline("bobershell> ");
+//		line = ft_strdup("exit");//"echo hi $PWD\"$PWD\"'$PWD'  $\"PWD\"");
 		add_history(line);
 		if (!line || !*line || check_syntax(line))
 		{
 			free(line);
 			continue ;
 		}
+//		printf("LINE: %s\n", line);
 		if (add_to_structs(line, minishell))
 			printf("Malloc failed xd\n");
 		if (do_command(minishell))
 			return (0);
 		freecmds(minishell->cmds);
 		minishell->cmds = 0;
+//		freeminishell(minishell);
 		free(line);
+//		return (0);
 	}
 	return (0);
 }
