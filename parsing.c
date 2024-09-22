@@ -6,7 +6,7 @@
 /*   By: alogvine <alogvine@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/29 14:29:48 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/22 12:12:17 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/22 21:31:47 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,20 +36,47 @@ int	check_arrow(char *s)
 	return (0);
 }
 
+int	check_arrow_file(char *s)
+{
+	int	i;
+
+	i = 0;
+	while (s[i])
+	{
+		if (s[i] == '<' || s[i] == '>')
+		{
+			while (s[i] && (s[i] == '<' || s[i] == '>'))
+				i++;
+			while (s[i] && s[i] == ' ')
+				i++;
+			if (!s[i] || (s[i] && (s[i] == '<' && s[i] == '>')))
+			{
+				if (s[i])
+					printf("bobershell: syntax error\n");
+				else if (!s[i])
+					printf("bobershell: syntax error\n");
+				return (1);
+			}
+		}
+		i++;
+	}
+	return (0);
+}
+
 int	redir_syntax(char *s)
 {
 	int		i;
 
 	i = 0;
-	while (*s++)
+	while (*s)
 	{
 		if (*s == '\'' || *s == '"')
 			s += qlen(s, *s) - 1;
-		else if (*s == '<' || *s == '>')
+		else if (*s && (*s == '<' || *s == '>'))
 		{
 			i = check_arrow(s++);
 			if (!*s)
-				return (1);
+				return (printf("bobershell: syntax error\n"));
 			if (*s && *s == ' ' && i < 3)
 			{
 				while (*s && *s == ' ')
@@ -59,7 +86,8 @@ int	redir_syntax(char *s)
 			}	
 		}
 		if (i > 2)
-			return (i);
+			return (printf("bobershell: syntax error\n"));
+		s++;
 	}
 	return (0);
 }
@@ -122,7 +150,6 @@ char	*parse_cmd(char *new, char *line)
 				new = ft_cjoin(new, *line++);
 		}
 	}
-	printf("NEW: %s\n", new);
 	return (new);
 }
 

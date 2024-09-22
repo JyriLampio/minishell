@@ -6,7 +6,7 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 10:33:14 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/22 18:00:47 by jlampio          ###   ########.fr       */
+/*   Updated: 2024/09/22 21:00:43 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,12 +63,11 @@ typedef struct s_cmds
 
 typedef struct s_minishell
 {
-    t_env    *env;
-    t_cmds   *cmds;
-    int      pipefds[2];
-    int      num_cmds;
-}      t_minishell;
-
+	t_env	*env;
+	t_cmds	*cmds;
+	int		pipefds[2];
+	int		num_cmds;
+}		t_minishell;
 
 char	**ft_split(char const *s, char c);
 size_t	ft_strlen(const char *str);
@@ -98,14 +97,16 @@ int		redir_syntax(char *s);
 int		dlen(char *line);
 int		ft_atoi(char *str);
 char	*ft_itoa(int i);
-
+void	*ft_calloc(size_t count, size_t size);
+int		check_arrow_file(char *s);
 // execve and builtins
 t_env	*ft_lstlast(t_env *lst);
 void	free_split(char **split);
 // void	check_builtins(t_minishell *minishell);
 int		is_builtin(char *cmd);
-void execute_builtin(t_minishell *minishell, t_cmds *current_cmd);
+void	execute_builtin(t_minishell *minishell, t_cmds *current_cmd);
 int		pipe_x(t_minishell *minishell);
 int		wait_processes(int pid);
-int handle_redirections(t_cmds *cmd);
+int		handle_redirections(t_cmds *cmd);
+
 #endif
