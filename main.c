@@ -6,7 +6,7 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 10:36:37 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/21 21:52:12 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/22 12:22:31 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -298,12 +298,13 @@ int	add_to_structs(char *line, t_minishell *minishell)
 		if (check_redirs(pipeline[n]))
 		{
 			redirline = parse_redirs(pipeline[n++]);
-			minishell->cmds = create_cmds(redirline, minishell, 1);
+			if (redirline)
+				minishell->cmds = create_cmds(redirline, minishell, 1);
+			free(redirline);
 		}
 		else
 			minishell->cmds = create_cmds(pipeline[n++], minishell, 0);
 	}
-	//free(redirline);
 	freestr(pipeline);
 	return (0);
 }
@@ -353,7 +354,10 @@ void	set_shlvl(t_env *env)
 		env = env->next;
 	}
 	if (check)
+	{
+		free(env->value);
 		env->value = ft_itoa(ft_atoi(env->value) + 1);
+	}
 	else
 		env = create_node("SHLVL", "1");
 }
@@ -492,34 +496,37 @@ near unexpected token '%c'\n", line[t]);
 	return (0);
 }
 
-int	main(int ac, char **av, char **envp)
+void	bobershell(t_minishell *minishell)
 {
-	char		*line;
-	t_minishell	*minishell;
+	char	*line;
 
-	(void)ac;
-	(void)av;
-	minishell = init_minishell(envp);
 	while (1)
 	{
 		line = readline("bobershell> ");
-//		line = ft_strdup("exit");//"echo hi $PWD\"$PWD\"'$PWD'  $\"PWD\"");
 		add_history(line);
 		if (!line || !*line || check_syntax(line))
 		{
 			free(line);
 			continue ;
 		}
-//		printf("LINE: %s\n", line);
 		if (add_to_structs(line, minishell))
-			printf("Malloc failed xd\n");
+			return (0);
 		if (do_command(minishell))
 			return (0);
 		freecmds(minishell->cmds);
 		minishell->cmds = 0;
-//		freeminishell(minishell);
 		free(line);
-//		return (0);
 	}
+}
+
+int	main(int ac, char **av, char **envp)
+{
+	t_minishell	*minishell;
+
+	(void)ac;
+	(void)av;
+	minishell = init_minishell(envp);
+	bobershell(minishell);
+	freeminishell(minishell);
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: alogvine <alogvine@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/29 14:29:48 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/21 21:36:18 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/22 12:12:17 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,7 +172,7 @@ char	*redir_line(char *line)
 	return (new);
 }
 
-char	**sort_redirs(char **redirs)
+void	sort_redirs(char **redirs)
 {
 	int		i;
 	int		n;
@@ -189,18 +189,15 @@ char	**sort_redirs(char **redirs)
 		if (redirs[i])
 		{
 			start = redirs[i];
-			n = i;
-			while (n > t)
+			n = i++;
+			while (t < n)
 			{
 				redirs[n] = redirs[n - 1];
 				n--;
 			}
 			redirs[t++] = start;
 		}
-		if (redirs[i])
-			i++;
 	}
-	return (redirs);
 }
 
 char	*parse_redirs(char *line)
@@ -208,22 +205,26 @@ char	*parse_redirs(char *line)
 	char	*temp;
 	char	**redirs;
 	char	*new;
+	int		i;
 
+	i = 0;
 	new = ft_strdup("");
 	temp = redir_line(line);
 	redirs = pipesplit(temp, '|');
-	if (!redirs || !new || !temp)
+	if (temp)
+		free(temp);
+	if (!redirs || !new)
 		return (0);
-	redirs = sort_redirs(redirs);
-	while (*redirs)
+	sort_redirs(redirs);
+	while (new && redirs[i])
 	{
-		new = ft_strjoin(new, *redirs++);
-		if (*redirs)
+		temp = new;
+		new = ft_strjoin(new, redirs[i++]);
+		free(temp);
+		if (new && *(redirs + i))
 			new = ft_cjoin(new, ' ');
 	}
-	free(temp);
 	if (redirs)
 		freestr(redirs);
-	printf("NEW: %s\n", new);
 	return (new);
 }

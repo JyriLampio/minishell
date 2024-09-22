@@ -6,7 +6,7 @@
 /*   By: alogvine <alogvine@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/16 11:15:50 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/20 15:54:54 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/22 11:52:19 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,8 @@ char	**freestr(char **str)
 	start = str;
 	while (*str)
 		free(*str++);
-	free(start);
+	if (*start)
+		free(start);
 	return (0);
 }
 
