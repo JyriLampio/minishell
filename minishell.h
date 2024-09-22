@@ -6,7 +6,7 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 10:33:14 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/22 15:58:17 by jlampio          ###   ########.fr       */
+/*   Updated: 2024/09/22 18:00:47 by jlampio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,5 +107,5 @@ int		is_builtin(char *cmd);
 void execute_builtin(t_minishell *minishell, t_cmds *current_cmd);
 int		pipe_x(t_minishell *minishell);
 int		wait_processes(int pid);
-
+int handle_redirections(t_cmds *cmd);
 #endif

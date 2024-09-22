@@ -6,7 +6,7 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 11:44:43 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/22 16:39:38 by jlampio          ###   ########.fr       */
+/*   Updated: 2024/09/22 18:59:03 by jlampio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,6 +134,29 @@ void print_exported_env(t_env *env)
     }
 }
 
+#include <stdlib.h>
+#include <string.h>
+
+// A helper function to split the string on the first occurrence of '='
+char **split_on_first_equals(char *str)
+{
+    char **result = malloc(sizeof(char *) * 3);  // Allocate space for key, value, and NULL
+    char *equal_sign = ft_strchr(str, '=');  // Find the first '='
+
+    if (!equal_sign)
+    {
+        result[0] = strdup(str);  // No '=' found, the whole string is the key
+        result[1] = NULL;         // No value
+    }
+    else
+    {
+        *equal_sign = '\0';  // Temporarily null-terminate at the first '='
+        result[0] = ft_strdup(str);      // The key
+        result[1] = ft_strdup(equal_sign + 1);  // The value (everything after the '=')
+    }
+    result[2] = NULL;  // Null-terminate the array
+    return result;
+}
 
 void builtin_export(t_env *env, t_args *args)
 {
@@ -141,19 +164,27 @@ void builtin_export(t_env *env, t_args *args)
     char **split;
 
     if (!args)
-	{
+    {
         print_exported_env(env);
         return;
     }
-    while (args) {
-        split = ft_split(args->arg, '=');
+
+    while (args)
+    {
+        split = split_on_first_equals(args->arg);  // Use the new function to split the key and value
         curr = env;
-        while (curr) {
-            if (ft_strcmp(curr->key, split[0]) == 0) {
-                if (split[1]) {
+
+        while (curr)
+        {
+            if (ft_strcmp(curr->key, split[0]) == 0)
+            {
+                if (split[1])
+                {
                     free(curr->value);
                     curr->value = ft_strdup(split[1]);
-                } else {
+                }
+                else
+                {
                     free(curr->value);
                     curr->value = NULL;  // Set the value to NULL if there's no value in the argument
                 }
@@ -163,7 +194,8 @@ void builtin_export(t_env *env, t_args *args)
         }
 
         // If key does not exist, create a new environment variable
-        if (!curr) {
+        if (!curr)
+        {
             t_env *new_env = malloc(sizeof(t_env));
             new_env->key = ft_strdup(split[0]);
             new_env->value = split[1] ? ft_strdup(split[1]) : NULL;
@@ -175,12 +207,61 @@ void builtin_export(t_env *env, t_args *args)
         }
 
         // Free split array to avoid memory leaks
-        free_split(split);
+        // free_split(split);
+		freestr(split);
 
         // Move to the next argument in the list
         args = args->next;
     }
 }
+
+
+// void builtin_export(t_env *env, t_args *args)
+// {
+//     t_env *curr;
+//     char **split;
+
+//     if (!args)
+// 	{
+//         print_exported_env(env);
+//         return;
+//     }
+//     while (args) {
+//         split = ft_split(args->arg, '=');
+//         curr = env;
+//         while (curr) {
+//             if (ft_strcmp(curr->key, split[0]) == 0) {
+//                 if (split[1]) {
+//                     free(curr->value);
+//                     curr->value = ft_strdup(split[1]);
+//                 } else {
+//                     free(curr->value);
+//                     curr->value = NULL;  // Set the value to NULL if there's no value in the argument
+//                 }
+//                 break;
+//             }
+//             curr = curr->next;
+//         }
+
+//         // If key does not exist, create a new environment variable
+//         if (!curr) {
+//             t_env *new_env = malloc(sizeof(t_env));
+//             new_env->key = ft_strdup(split[0]);
+//             new_env->value = split[1] ? ft_strdup(split[1]) : NULL;
+//             new_env->next = NULL;
+
+//             // Find the last node of the environment list to append the new variable
+//             t_env *last = ft_lstlast(env);
+//             last->next = new_env;
+//         }
+
+//         // Free split array to avoid memory leaks
+//         free_split(split);
+
+//         // Move to the next argument in the list
+//         args = args->next;
+//     }
+// }
 
 void builtin_unset(t_env **env, t_args *args)
 {
@@ -237,32 +318,63 @@ void execute_builtin(t_minishell *minishell, t_cmds *current_cmd)
 		free_and_exit(minishell);
 }
 
-int	check_builtins(t_minishell *minishell)
+void execute_single_builtin(t_minishell *minishell, t_cmds *current_cmd)
 {
-	pipe_x(minishell);
+    int stdin_backup;
+    int stdout_backup;
 
-	return (0);
+	stdin_backup = dup(STDIN_FILENO);
+	stdout_backup = dup(STDOUT_FILENO);
+
+    // Handle redirections
+    if (handle_redirections(current_cmd) == -1)
+    {
+        // Restore original file descriptors before returning
+        dup2(stdin_backup, STDIN_FILENO);
+        dup2(stdout_backup, STDOUT_FILENO);
+        close(stdin_backup);
+        close(stdout_backup);
+        return;
+    }
+
+    // Execute the built-in command
+    execute_builtin(minishell, current_cmd);
+
+    // Restore original file descriptors
+    dup2(stdin_backup, STDIN_FILENO);
+    dup2(stdout_backup, STDOUT_FILENO);
+    close(stdin_backup);
+    close(stdout_backup);
 }
+
 
 // int	check_builtins(t_minishell *minishell)
 // {
-// 	t_cmds	*cmds;
-// 	cmds = minishell->cmds;
-// 	if (cmds->next == NULL && is_builtin(cmds->cmd) && cmds->cmd)  // Only one command
-// 	{
-// 		printf("Single command builtin\n");
-// 			execute_builtin(minishell, cmds);
-// 		// else
-// 		// 	execute_single_command(minishell);
-// 	}
-// 	else
-// 	{
-// 		printf("Piping\n");
-// 		pipe_x(minishell);
-// 		// execution(minishell);
-// 	}
+// 	pipe_x(minishell);
+
 // 	return (0);
 // }
+
+int	check_builtins(t_minishell *minishell)
+{
+	t_cmds	*cmds;
+	cmds = minishell->cmds;
+	if (cmds->next == NULL && cmds->cmd && is_builtin(cmds->cmd))  // Only one command
+	{
+		printf("Single command builtin\n");
+			// execute_builtin(minishell, cmds);
+			execute_single_builtin(minishell, cmds);
+		// else
+		// 	execute_single_command(minishell);
+	}
+	else
+	{
+		printf("Piping\n");
+		pipe_x(minishell);
+		// execution(minishell);
+	}
+	return (0);
+}
 
 // void	check_builtins(t_minishell *minishell)
 // {
