@@ -6,7 +6,7 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 10:36:37 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/22 21:29:06 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/22 21:44:55 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,9 +167,7 @@ char	*ft_cjoin(char *s1, char c)
 char	*ft_expjoin(char *new, char *line, t_env *env)
 {
 	char	*key;
-	char	*temp;
 
-	temp = new;
 	key = ft_strdup("");
 	if (!key)
 		return (0);
@@ -408,9 +406,6 @@ int	check_quotes(char *line)
 
 int	check_double(char *line)
 {
-	int	i;
-
-	i = 0;
 	while (*line)
 	{
 		if (*line && (*line == '\'' || *line == '"'))
