@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   free.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alogvine <alogvine@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/04 14:31:39 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/22 11:56:24 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/22 13:48:09 by jlampio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void	freeredirs(t_redirs *redirs)
 	while (curr)
 	{
 		temp = curr;
-		free(redirs->file);
+		free(curr->file);
 		curr = curr->next;
 		free(temp);
 	}

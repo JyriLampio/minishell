@@ -6,7 +6,7 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 10:36:37 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/22 12:27:16 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/22 15:20:22 by jlampio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,6 +108,7 @@ t_cmds	*create_cmd(char *pipeline, t_minishell *minishell, int redir)
 	temp = args;
 	new->args = 0;
 	new->redirs = 0;
+	new->cmd = 0;
 	if (*args && *args[0] != '<' && *args[0] != '>')
 		new->cmd = expand(*args++, minishell);
 	while (*args && *args[0] != '<' && *args[0] != '>')

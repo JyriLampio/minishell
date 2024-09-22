@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alogvine <alogvine@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 10:33:14 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/21 17:00:42 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/22 15:58:17 by jlampio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include <stdlib.h>
 # include <readline/readline.h>
 # include <readline/history.h>
+# include <fcntl.h>
 
 typedef enum e_redir_type
 {
@@ -54,11 +55,20 @@ typedef struct s_cmds
 	struct s_cmds	*next;
 }		t_cmds;
 
+// typedef struct s_minishell
+// {
+// 	t_env	*env;
+// 	t_cmds	*cmds;
+// }		t_minishell;
+
 typedef struct s_minishell
 {
-	t_env	*env;
-	t_cmds	*cmds;
-}		t_minishell;
+    t_env    *env;
+    t_cmds   *cmds;
+    int      pipefds[2];
+    int      num_cmds;
+}      t_minishell;
+
 
 char	**ft_split(char const *s, char c);
 size_t	ft_strlen(const char *str);
@@ -88,5 +98,14 @@ int		redir_syntax(char *s);
 int		dlen(char *line);
 int		ft_atoi(char *str);
 char	*ft_itoa(int i);
+
+// execve and builtins
+t_env	*ft_lstlast(t_env *lst);
+void	free_split(char **split);
+// void	check_builtins(t_minishell *minishell);
+int		is_builtin(char *cmd);
+void execute_builtin(t_minishell *minishell, t_cmds *current_cmd);
+int		pipe_x(t_minishell *minishell);
+int		wait_processes(int pid);
 
 #endif

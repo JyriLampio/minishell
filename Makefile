@@ -6,7 +6,7 @@
 #    By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/16 11:05:56 by alogvine          #+#    #+#              #
-#    Updated: 2024/09/22 11:04:04 by alogvine         ###   ########.fr        #
+#    Updated: 2024/09/22 15:43:19 by jlampio          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,15 +14,17 @@ SRCS = main.c			\
 	   builtins.c		\
 	   free.c			\
 	   pipesplit.c		\
-	   parsing.c
-
+	   parsing.c		\
+	   pipe.c			\
+	   builtins_utils.c	\
+	   
 OBJ = $(SRCS:.c=.o)
 
 LIBFT = libft/libft.a
 LIBFT_DIR = libft/
 
 CC = cc
-CFLAGS = -Wall -Werror -Wextra -g -fsanitize=address
+CFLAGS = -Wall -Werror -Wextra -g #-fsanitize=address
 LDFLAGS = -L$(LIBFT_DIR) -lft
 
 NAME = minishell
