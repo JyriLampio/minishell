@@ -6,7 +6,7 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 10:36:37 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/22 12:22:31 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/22 12:27:16 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -283,12 +283,10 @@ char	*expand(char *line, t_minishell *minishell)
 
 int	add_to_structs(char *line, t_minishell *minishell)
 {
-	int		i;
 	int		n;
 	char	**pipeline;
 	char	*redirline;
 
-	i = 0;
 	n = 0;
 	pipeline = pipesplit(line, '|');
 	if (!pipeline || !*pipeline)
@@ -510,9 +508,9 @@ void	bobershell(t_minishell *minishell)
 			continue ;
 		}
 		if (add_to_structs(line, minishell))
-			return (0);
+			return ;
 		if (do_command(minishell))
-			return (0);
+			return ;
 		freecmds(minishell->cmds);
 		minishell->cmds = 0;
 		free(line);
