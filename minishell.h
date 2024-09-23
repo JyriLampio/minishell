@@ -6,7 +6,7 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 10:33:14 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/23 16:06:57 by jlampio          ###   ########.fr       */
+/*   Updated: 2024/09/23 17:41:07 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,7 +139,8 @@ int				is_builtin(char *cmd);
 void			safe_exit(t_minishell *minishell, int status);
 char			*find_executable(char *cmd, t_env *env_list);
 int				execute_cmds(t_minishell *minishell, char **envp);
-void			execute_child_process(t_minishell *minishell, t_cmds *current_cmd, char **envp, int index);
+void			execute_child_process(t_minishell *minishell,
+					t_cmds *current_cmd, char **envp, int index);
 void			builtin_export(t_env *env, t_args *args);
 int				get_cwd(void);
 void			print_env(t_env *env);
