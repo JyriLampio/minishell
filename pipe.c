@@ -6,7 +6,7 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/23 08:17:33 by jlampio           #+#    #+#             */
-/*   Updated: 2024/09/23 09:11:00 by jlampio          ###   ########.fr       */
+/*   Updated: 2024/09/23 09:45:09 by jlampio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,6 @@ char *find_executable(char *cmd, t_env *env_list)
 	}
 	else if (cmd[0] == '/')
 		return cmd;
-
-	
 	i = 0;
     if (!path)
     {
@@ -131,7 +129,8 @@ int is_builtin(char *cmd) {
 }
 
 // UUUUUSUSU FUNKTIO REDIRECT ONGELMALLE
-int has_output_redirection(t_redirs *redirs) {
+int has_output_redirection(t_redirs *redirs)
+{
     t_redirs *redir = redirs;
     while (redir != NULL) {
         if (redir->type == REDIR_OUT || redir->type == REDIR_APPEND) {
@@ -142,7 +141,8 @@ int has_output_redirection(t_redirs *redirs) {
     return 0;
 }
 
-int has_input_redirection(t_redirs *redirs) {
+int has_input_redirection(t_redirs *redirs)
+{
     t_redirs *redir = redirs;
     while (redir != NULL) {
         if (redir->type == REDIR_IN || redir->type == REDIR_HEREDOC) {
@@ -253,14 +253,12 @@ int pipe_x(t_minishell *minishell)
 {
     t_cmds	*current_cmd;
 	int		i;
-	int		status;
     char	**envp; 
-	int		in_fd;
 	int		output_redirected;
 	int 	input_redirected;
 
 	envp = convert_env(minishell->env);
-    in_fd = STDIN_FILENO;
+	minishell->write_end = STDIN_FILENO;
 	i = 0;
     current_cmd = minishell->cmds;
 	if (prepare_execution(minishell) == -1)
@@ -288,13 +286,13 @@ int pipe_x(t_minishell *minishell)
 			input_redirected = has_input_redirection(current_cmd->redirs);
 			ft_putstr_fd("Input redirected\n", 1);
 			// Set up pipe input
-			if (in_fd != STDIN_FILENO) {
+			if (minishell->write_end != STDIN_FILENO) {
 				if (!input_redirected) {
 					// Redirect input from the previous pipe's read end
-					dup2(in_fd, STDIN_FILENO);
+					dup2(minishell->write_end, STDIN_FILENO);
 				}
 				// Close in_fd in any case
-				close(in_fd);
+				close(minishell->write_end);
 			}
 
 			// Check if output is redirected to a file
@@ -343,13 +341,13 @@ int pipe_x(t_minishell *minishell)
 		}
 
 		// Close the previous read end, and prepare the new one
-		if (in_fd != STDIN_FILENO) {
-			close(in_fd);
+		if (minishell->write_end != STDIN_FILENO) {
+			close(minishell->write_end);
 		}
 
 		// The input for the next command will be the current pipe's read end
 		if (i < minishell->num_cmds - 1) {
-			in_fd = minishell->pipefds[0];
+			minishell->write_end = minishell->pipefds[0];
 		} else {
 			// No more commands, close the read end
 			if (minishell->num_cmds > 1)
@@ -361,8 +359,9 @@ int pipe_x(t_minishell *minishell)
 
     }
 	while (i < minishell->num_cmds)
-			status = wait_processes(minishell->pid[i++]);
-	minishell->exit_status = status;
+			// status = wait_processes(minishell->pid[i++]);
+			minishell->exit_status = wait_processes(minishell->pid[i++]);
+	// minishell->exit_status = status;
 	freestr(envp);
     return 0;
 }

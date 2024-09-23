@@ -6,7 +6,7 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 10:33:14 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/23 08:50:30 by jlampio          ###   ########.fr       */
+/*   Updated: 2024/09/23 09:39:01 by jlampio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 # include <fcntl.h>
 # include <sys/types.h>
 # include <sys/wait.h>
+# include <signal.h>
 
 # define MAX_PATH_LENGTH 1024
 
@@ -73,6 +74,7 @@ typedef struct s_minishell
 	int		num_cmds;
 	int		exit_status;
 	int		*pid;
+	int		write_end;
 }		t_minishell;
 
 char	**ft_split(char const *s, char c);
@@ -124,5 +126,8 @@ char	**build_argv(char *cmd_path, t_args *args);
 int		prepare_execution(t_minishell *minishell);
 int		error_msg(t_minishell *minishell, char *file, int exit_code);
 
+
+// Signal handling
+void	handle_parent_signals(int sig);
 
 #endif
