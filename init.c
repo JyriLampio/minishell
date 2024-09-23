@@ -65,7 +65,7 @@ t_env	*init_env(char **envp)
 	i = 0;
 	while (*envp && envp[i])
 	{
-		str = ft_split(envp[i], '=');
+		str = pipesplit(envp[i], '=');
 		if (!str)
 			return (0);
 		new = make_node(str[0], str[1]);

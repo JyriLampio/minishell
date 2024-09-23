@@ -6,7 +6,7 @@
 /*   By: alogvine <alogvine@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/23 14:36:52 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/23 14:36:53 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/23 19:51:45 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,22 +49,37 @@ char	*cjoin(char *s1, char c)
 	return (str);
 }
 
+char	*parse_key(char *new, char *key)
+{
+	char	*temp;
+
+	if (new)
+	{
+		temp = new;
+		new = ft_strdup("");
+		if (new)
+			return (new);
+		new = ft_strjoin(new, key);
+		free(temp);
+	}
+	if (!new)
+		return ("");
+	return (new);
+}
+
 char	*expjoin(char *new, char *line, t_env *env)
 {
 	char	*key;
 
 	key = ft_strdup("");
-	if (!key)
-		return (0);
-	if (new && *line == '$')
+	if (key && new && *line++ == '$')
 	{
-		line++;
 		while (key && *line && *line != ' ' && *line != '"' && *line != '\'')
 			key = cjoin(key, *line++);
 		while (new && key && env)
 		{
 			if (!ft_strcmp(key, env->key))
-				new = ft_strjoin(new, env->value);
+				new = parse_key(new, env->key);
 			env = env->next;
 		}
 	}

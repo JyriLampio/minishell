@@ -36,10 +36,15 @@ static void	print_exported_env(t_env *env)
 
 static void	update_env_value(t_env *curr, char **split)
 {
-	if (split[1])
+	if (*split)
 	{
 		free(curr->value);
-		curr->value = ft_strdup(split[1]);
+		curr->value = ft_strdup(*split++);
+		while (*split)
+		{
+			curr->value = ft_strjoin(curr->value, "=");
+			curr->value = ft_strjoin(curr->value, *split++);
+		}
 	}
 	else
 	{
@@ -56,9 +61,16 @@ static void	add_new_env(t_env *env, char **split)
 	new_env = malloc(sizeof(t_env));
 	if (!new_env)
 		return ;
-	new_env->key = ft_strdup(split[0]);
-	if (split[1])
-		new_env->value = ft_strdup(split[1]);
+	new_env->key = ft_strdup(*split++);
+	if (*split)
+	{
+		new_env->value = ft_strdup(*split++);
+		while (*split)
+		{
+			new_env->value = ft_strjoin(new_env->value, "=");
+			new_env->value = ft_strjoin(new_env->value, *split++);
+		}
+	}
 	else
 		new_env->value = NULL;
 	new_env->next = NULL;
@@ -75,7 +87,7 @@ static void	update_or_add_env(t_env *env, char **split)
 	{
 		if (ft_strcmp(curr->key, split[0]) == 0)
 		{
-			update_env_value(curr, split);
+			update_env_value(curr, split + 1);
 			return ;
 		}
 		curr = curr->next;
@@ -94,7 +106,7 @@ void	builtin_export(t_env *env, t_args *args)
 	}
 	while (args)
 	{
-		split = split_on_first_equals(args->arg);
+		split = pipesplit(args->arg, '=');
 		update_or_add_env(env, split);
 		freestr(split);
 		args = args->next;
