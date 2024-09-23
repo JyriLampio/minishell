@@ -6,7 +6,7 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/23 08:17:33 by jlampio           #+#    #+#             */
-/*   Updated: 2024/09/23 17:24:50 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/23 17:29:09 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,20 +97,17 @@ void	execute_child_process(t_minishell *minishell,
 		minishell->exit_status = execute_builtin(minishell, current_cmd);
 		safe_exit(minishell, 1);
 	}
-	else
+	cmd_path = find_executable(current_cmd->cmd, minishell->env);
+	if (cmd_path == NULL)
 	{
-		cmd_path = find_executable(current_cmd->cmd, minishell->env);
-		if (cmd_path == NULL)
-		{
-			ft_putstr_fd(current_cmd->cmd, 2);
-			ft_putstr_fd(": command not found\n", 2);
-			safe_exit(minishell, 127);
-		}
-		arg = build_argv(cmd_path, current_cmd->args);
-		execve(cmd_path, argv, envp);
-		perror("execve ERROR");
-		safe_exit(minishell, 1);
+		ft_putstr_fd(current_cmd->cmd, 2);
+		ft_putstr_fd(": command not found\n", 2);
+		safe_exit(minishell, 127);
 	}
+	argv = build_argv(cmd_path, current_cmd->args);
+	execve(cmd_path, argv, envp);
+	perror("execve ERROR");
+	safe_exit(minishell, 1);
 }
 
 int	pipe_x(t_minishell *minishell)
