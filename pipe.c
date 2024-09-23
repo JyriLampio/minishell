@@ -6,7 +6,7 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/23 08:17:33 by jlampio           #+#    #+#             */
-/*   Updated: 2024/09/23 08:23:38 by jlampio          ###   ########.fr       */
+/*   Updated: 2024/09/23 09:11:00 by jlampio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -251,44 +251,42 @@ int handle_redirections(t_cmds *cmd)
 
 int pipe_x(t_minishell *minishell)
 {
-    t_cmds *current_cmd = minishell->cmds;
-    int num_cmds = 0;
+    t_cmds	*current_cmd;
+	int		i;
+	int		status;
+    char	**envp; 
+	int		in_fd;
+	int		output_redirected;
+	int 	input_redirected;
 
-    while (current_cmd != NULL) {
-        num_cmds++;
-        current_cmd = current_cmd->next;
-    }
-
-    int pipefds[2]; 
-    pid_t pid;
-    char **envp = convert_env(minishell->env);
-    int in_fd = STDIN_FILENO;  // Initial input is from stdin
-
+	envp = convert_env(minishell->env);
+    in_fd = STDIN_FILENO;
+	i = 0;
     current_cmd = minishell->cmds;
-
-    for (int i = 0; i < num_cmds; i++) {
+	if (prepare_execution(minishell) == -1)
+		return (1);
+    for (int i = 0; i < minishell->num_cmds; i++) {
         // Create a pipe for the next command, unless it's the last command
-        if (i < num_cmds - 1) {
-            if (pipe(pipefds) == -1) {
+        if (i < minishell->num_cmds - 1) {
+            if (pipe(minishell->pipefds) == -1) {
                 perror("pipe ERROR");
                 return 1;
             }
         }
-
-        pid = fork();
-        if (pid == -1) {
+        minishell->pid[i] = fork();
+        if (minishell->pid[i] == -1) {
             perror("fork ERROR");
             return 1;
         }
 
-		if (pid == 0) {  // Child process
+		if (minishell->pid[i] == 0) {  // Child process
 			// Handle redirections first
 			if (handle_redirections(current_cmd) == -1)
 				exit(1); // Exit if redirection fails
 
 			// Check if input is redirected
-			int input_redirected = has_input_redirection(current_cmd->redirs);
-
+			input_redirected = has_input_redirection(current_cmd->redirs);
+			ft_putstr_fd("Input redirected\n", 1);
 			// Set up pipe input
 			if (in_fd != STDIN_FILENO) {
 				if (!input_redirected) {
@@ -300,20 +298,20 @@ int pipe_x(t_minishell *minishell)
 			}
 
 			// Check if output is redirected to a file
-			int output_redirected = has_output_redirection(current_cmd->redirs);
+			output_redirected = has_output_redirection(current_cmd->redirs);
 
-			if (i < num_cmds - 1) {
+			if (i < minishell->num_cmds - 1) {
 				if (!output_redirected) {
 					// Redirect output to the next pipe's write end
-					dup2(pipefds[1], STDOUT_FILENO);
+					dup2(minishell->pipefds[1], STDOUT_FILENO);
 				}
 				// Close the pipe's write end
-				close(pipefds[1]);
+				close(minishell->pipefds[1]);
 			}
 
 			// Close unused pipe end
-			if (num_cmds > 1)
-				close(pipefds[0]);
+			if (minishell->num_cmds > 1)
+				close(minishell->pipefds[0]);
 
 			// Check if command is NULL
 			if (current_cmd->cmd == NULL) {
@@ -340,8 +338,8 @@ int pipe_x(t_minishell *minishell)
 			// Parent process
 
 		// Close write end of the current pipe in the parent
-		if (i < num_cmds - 1) {
-			close(pipefds[1]);
+		if (i < minishell->num_cmds - 1) {
+			close(minishell->pipefds[1]);
 		}
 
 		// Close the previous read end, and prepare the new one
@@ -350,24 +348,21 @@ int pipe_x(t_minishell *minishell)
 		}
 
 		// The input for the next command will be the current pipe's read end
-		if (i < num_cmds - 1) {
-			in_fd = pipefds[0];
+		if (i < minishell->num_cmds - 1) {
+			in_fd = minishell->pipefds[0];
 		} else {
 			// No more commands, close the read end
-			if (num_cmds > 1)
-			close(pipefds[0]);
+			if (minishell->num_cmds > 1)
+			close(minishell->pipefds[0]);
 		}
 
 		// Move to the next command in the list
 		current_cmd = current_cmd->next;
 
     }
-
-    // Parent process: wait for all child processes
-    for (int i = 0; i < num_cmds; i++) {
-        wait(NULL);
-    }
-	// ft_putstr_fd("FREEING PIPES\n", 1);
+	while (i < minishell->num_cmds)
+			status = wait_processes(minishell->pid[i++]);
+	minishell->exit_status = status;
 	freestr(envp);
     return 0;
 }

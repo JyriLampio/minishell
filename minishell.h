@@ -6,7 +6,7 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 10:33:14 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/23 08:21:03 by jlampio          ###   ########.fr       */
+/*   Updated: 2024/09/23 08:50:30 by jlampio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,8 @@ typedef struct s_minishell
 	t_cmds	*cmds;
 	int		pipefds[2];
 	int		num_cmds;
+	int		exit_status;
+	int		*pid;
 }		t_minishell;
 
 char	**ft_split(char const *s, char c);
@@ -119,6 +121,8 @@ void	update_environment_variable(t_env *env, char *key, char *value);
 char	**arr_args(t_args *args);
 char	**split_on_first_equals(char *str);
 char	**build_argv(char *cmd_path, t_args *args);
+int		prepare_execution(t_minishell *minishell);
+int		error_msg(t_minishell *minishell, char *file, int exit_code);
 
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 11:44:43 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/23 08:09:57 by jlampio          ###   ########.fr       */
+/*   Updated: 2024/09/23 08:36:35 by jlampio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -228,10 +228,19 @@ void execute_single_builtin(t_minishell *minishell, t_cmds *current_cmd)
 int	check_builtins(t_minishell *minishell)
 {
 	t_cmds	*cmds;
+	int		num_cmds;
+
 	cmds = minishell->cmds;
-	if (cmds->next == NULL && cmds->cmd && is_builtin(cmds->cmd))  // Only one command
+	num_cmds = 0;
+	while (cmds != NULL) {
+        num_cmds++;
+        cmds = cmds->next;
+    }
+	minishell->num_cmds = num_cmds;
+	cmds = minishell->cmds;
+	if (num_cmds == 1 && cmds->cmd && is_builtin(cmds->cmd))  // Only one command
 	{
-		// printf("Single command builtin\n");
+		printf("Single command builtin\n");
 			// execute_builtin(minishell, cmds);
 			execute_single_builtin(minishell, cmds);
 		// else
@@ -245,48 +254,4 @@ int	check_builtins(t_minishell *minishell)
 	}
 	return (0);
 }
-
-// void	check_builtins(t_minishell *minishell)
-// {
-// 	t_cmds	*cmds;
-// 	write(1, "Checking builtins...\n", 21);
-// 	cmds = minishell->cmds;
-
-// 	if (!ft_strcmp("echo", cmds->cmd))
-// 		builtin_echo(arr_args(cmds->args));
-// 	else if (!ft_strcmp("cd", cmds->cmd))
-// 		// printf("BUILTIN: CD\n");
-// 		builtin_cd(arr_args(cmds->args));
-// 	else if (!ft_strcmp("pwd", cmds->cmd))
-// 		// printf("BUILTIN: PWD\n");
-// 		get_cwd();
-// 	else if (!ft_strcmp("export", cmds->cmd))
-// 		// printf("BUILTIN: export\n");
-// 		{
-// 			printf("BUILTIN: EXPORT\n");
-// 			builtin_export(minishell->env, cmds->args);
-// 		}
-// 	else if (!ft_strcmp("unset", cmds->cmd))
-// 		// printf("BUILTIN: UNSET\n");
-// 		builtin_unset(&minishell->env, cmds->args);
-// 	else if (!ft_strcmp("env", cmds->cmd))
-// 		print_env(minishell->env);
-// 	else if (!ft_strcmp("exit", cmds->cmd))
-// 		free_and_exit(minishell);
-// 	else
-// 	{
-// 		ft_putstr_fd("Checking execve...\n", 1);
-// 		if (minishell->cmds->next == NULL)  // Only one command
-// 		{
-// 			printf("Single command\n");
-// 			execute_single_command(minishell);
-// 			write(1, "Single commanDONEd\n", 16);
-// 		}
-// 		else  // More than one command, use piping
-// 		{
-// 			printf("Piping\n");
-// 			pipe_x(minishell);
-// 		}
-// 	}
-// }
 
