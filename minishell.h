@@ -6,7 +6,7 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 10:33:14 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/23 13:38:08 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/23 16:06:57 by jlampio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,6 +134,16 @@ char			**split_on_first_equals(char *str);
 char			**build_argv(char *cmd_path, t_args *args);
 int				prepare_execution(t_minishell *minishell);
 int				error_msg(t_minishell *minishell, char *file, int exit_code);
+int				ft_strncmp(const char *s1, const char *s2, size_t n);
+int				is_builtin(char *cmd);
+void			safe_exit(t_minishell *minishell, int status);
+char			*find_executable(char *cmd, t_env *env_list);
+int				execute_cmds(t_minishell *minishell, char **envp);
+void			execute_child_process(t_minishell *minishell, t_cmds *current_cmd, char **envp, int index);
+void			builtin_export(t_env *env, t_args *args);
+int				get_cwd(void);
+void			print_env(t_env *env);
+void			builtin_unset(t_env **env, t_args *args);
 
 // Signal handling
 void			handle_parent_signals(int sig);

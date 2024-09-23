@@ -6,14 +6,13 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/23 08:43:23 by jlampio           #+#    #+#             */
-/*   Updated: 2024/09/23 08:49:57 by jlampio          ###   ########.fr       */
+/*   Updated: 2024/09/23 16:14:58 by jlampio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 # include "minishell.h"
 
 int	wait_processes(int pid)
-// int	wait_processes(int pid, int command_count)
 {
 	int	status;
 	int	exit_code;

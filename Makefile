@@ -6,7 +6,7 @@
 #    By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/16 11:05:56 by alogvine          #+#    #+#              #
-#    Updated: 2024/09/23 10:48:23 by jlampio          ###   ########.fr        #
+#    Updated: 2024/09/23 16:04:27 by jlampio          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -30,7 +30,13 @@ SRCS = main.c				\
 	   make_structs_utils.c	\
 	   check_syntax.c		\
 	   expand.c				\
-	   expand_utils.c
+	   expand_utils.c		\
+	   pipe_utils_2.c		\
+	   pipe_utils_3.c		\
+	   builtin_export.c		\
+	   builtin_unset.c		\
+	   builtin_env.c		\
+	   builtin_pwd.c
 	   
 OBJ = $(SRCS:.c=.o)
 

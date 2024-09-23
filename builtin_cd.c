@@ -6,7 +6,7 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/23 07:30:36 by jlampio           #+#    #+#             */
-/*   Updated: 2024/09/23 11:49:31 by jlampio          ###   ########.fr       */
+/*   Updated: 2024/09/23 12:39:18 by jlampio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,12 +51,15 @@ int builtin_cd(char **args, t_env *env)
     }
     else
     {
+		printf("TÄÄLSLSÄ");
         if (chdir(args[0]) != 0)
         {
+			printf("TÄÄLSLSÄ");
             perror("cd");
             return (1);
         }
     }
+	printf("TÄÄLSLSÄ");
     if (getcwd(cwd, sizeof(cwd)) != NULL)
 		update_environment_variable(env, "OLDPWD", pwd);
 	return (0);
