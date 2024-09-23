@@ -6,7 +6,7 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 11:44:43 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/23 08:36:35 by jlampio          ###   ########.fr       */
+/*   Updated: 2024/09/23 12:12:53 by jlampio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ void	cmd_echo(t_args *args)
 	int		n;
 
 	n = 0;
-	while (args && args->arg[0] == '-' && args->arg[1] == 'n')
+	while (args && args->arg[0] == '-' && args->arg[1] == 'n' && args->arg[2] == '\0')
 	{
 		n = 1;
 		args = args->next;
@@ -60,7 +60,7 @@ void	print_env(t_env *env)
 	}
 }
 
-void get_cwd(void)
+int	get_cwd(void)
 {
     char cwd[1024];
     if (getcwd(cwd, sizeof(cwd)) != NULL)
@@ -69,7 +69,11 @@ void get_cwd(void)
         ft_putstr_fd("\n", STDOUT_FILENO);
     }
     else
+	{
         perror("getcwd() error");
+		return (1);
+	}
+	return (0);
 }
 
 void print_exported_env(t_env *env)
@@ -167,7 +171,7 @@ void builtin_unset(t_env **env, t_args *args)
     }
 }
 
-void execute_builtin(t_minishell *minishell, t_cmds *current_cmd)
+int execute_builtin(t_minishell *minishell, t_cmds *current_cmd)
 {
 	t_cmds	*cmds;
 
@@ -175,17 +179,18 @@ void execute_builtin(t_minishell *minishell, t_cmds *current_cmd)
 	if (!ft_strcmp("echo", cmds->cmd))
 		cmd_echo(cmds->args);
 	else if (!ft_strcmp("cd", cmds->cmd))
-		builtin_cd(arr_args(cmds->args), minishell->env);
+		return(builtin_cd(arr_args(cmds->args), minishell->env));
 	else if (!ft_strcmp("pwd", cmds->cmd))
 		get_cwd();
 	else if (!ft_strcmp("export", cmds->cmd))
-			builtin_export(minishell->env, cmds->args);
+		builtin_export(minishell->env, cmds->args);
 	else if (!ft_strcmp("unset", cmds->cmd))
 		builtin_unset(&minishell->env, cmds->args);
 	else if (!ft_strcmp("env", cmds->cmd))
 		print_env(minishell->env);
 	else if (!ft_strcmp("exit", cmds->cmd))
 		free_and_exit(minishell);
+	return (0);
 }
 
 void execute_single_builtin(t_minishell *minishell, t_cmds *current_cmd)
@@ -243,6 +248,7 @@ int	check_builtins(t_minishell *minishell)
 		printf("Single command builtin\n");
 			// execute_builtin(minishell, cmds);
 			execute_single_builtin(minishell, cmds);
+			printf("EXITSTATUS: %d", minishell->exit_status);
 		// else
 		// 	execute_single_command(minishell);
 	}

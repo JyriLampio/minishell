@@ -6,7 +6,7 @@
 #    By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/16 11:05:56 by alogvine          #+#    #+#              #
-#    Updated: 2024/09/23 09:25:14 by jlampio          ###   ########.fr        #
+#    Updated: 2024/09/23 10:48:23 by jlampio          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -21,6 +21,9 @@ SRCS = main.c			\
 	   builtin_cd.c		\
 	   pipe_utils.c		\
 	   signals.c		\
+	   close.c			\
+	   duplicators.c	\
+	   redirs.c			\
 	   
 OBJ = $(SRCS:.c=.o)
 

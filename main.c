@@ -6,7 +6,7 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 10:36:37 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/22 21:44:55 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/23 09:24:51 by jlampio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -509,6 +509,8 @@ int	main(int ac, char **av, char **envp)
 
 	(void)ac;
 	(void)av;
+	signal(SIGINT, handle_parent_signals);
+	signal(SIGQUIT, SIG_IGN);
 	minishell = init_minishell(envp);
 	bobershell(minishell);
 	freeminishell(minishell);

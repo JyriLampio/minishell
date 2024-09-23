@@ -6,7 +6,7 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 10:33:14 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/23 09:39:01 by jlampio          ###   ########.fr       */
+/*   Updated: 2024/09/23 11:59:11 by jlampio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 # include <sys/types.h>
 # include <sys/wait.h>
 # include <signal.h>
+# include <errno.h>
 
 # define MAX_PATH_LENGTH 1024
 
@@ -114,11 +115,11 @@ t_env	*ft_lstlast(t_env *lst);
 void	free_split(char **split);
 // void	check_builtins(t_minishell *minishell);
 int		is_builtin(char *cmd);
-void	execute_builtin(t_minishell *minishell, t_cmds *current_cmd);
+int		execute_builtin(t_minishell *minishell, t_cmds *current_cmd);
 int		pipe_x(t_minishell *minishell);
 int		wait_processes(int pid);
 int		handle_redirections(t_cmds *cmd);
-void	builtin_cd(char **args, t_env *env);
+int		builtin_cd(char **args, t_env *env);
 void	update_environment_variable(t_env *env, char *key, char *value);
 char	**arr_args(t_args *args);
 char	**split_on_first_equals(char *str);
@@ -129,5 +130,16 @@ int		error_msg(t_minishell *minishell, char *file, int exit_code);
 
 // Signal handling
 void	handle_parent_signals(int sig);
+
+// Duplication functions
+int		dup_stdin(t_minishell *minishell, t_cmds *cmd);
+int		dup_stdout(t_minishell *minishell, t_cmds *cmd, int index);
+int		dup_file_descriptors(t_minishell *minishell, t_cmds *cmd, int index);
+void	close_fds(t_minishell *minishell);
+
+// redir functions
+int		handle_redirections(t_cmds *cmd);
+int		has_input_redirection(t_redirs *redirs);
+int		has_output_redirection(t_redirs *redirs);
 
 #endif
