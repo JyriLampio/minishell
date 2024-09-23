@@ -6,7 +6,7 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 10:33:14 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/23 08:09:05 by jlampio          ###   ########.fr       */
+/*   Updated: 2024/09/23 08:21:03 by jlampio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,10 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 # include <fcntl.h>
+# include <sys/types.h>
+# include <sys/wait.h>
+
+# define MAX_PATH_LENGTH 1024
 
 typedef enum e_redir_type
 {
@@ -99,6 +103,7 @@ int		ft_atoi(char *str);
 char	*ft_itoa(int i);
 void	*ft_calloc(size_t count, size_t size);
 int		check_arrow_file(char *s);
+
 // execve and builtins
 char	*get_env_value(t_env *env_list, const char *key);
 t_env	*ft_lstlast(t_env *lst);
@@ -113,5 +118,7 @@ void	builtin_cd(char **args, t_env *env);
 void	update_environment_variable(t_env *env, char *key, char *value);
 char	**arr_args(t_args *args);
 char	**split_on_first_equals(char *str);
+char	**build_argv(char *cmd_path, t_args *args);
+
 
 #endif
