@@ -10,9 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "minishell.h"
+#include "minishell.h"
 
-int	g_signum = 0;
+int		g_signum = 0;
 
 void	handle_parent_signals(int sig)
 {

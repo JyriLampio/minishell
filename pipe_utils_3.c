@@ -6,54 +6,55 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/23 14:53:10 by jlampio           #+#    #+#             */
-/*   Updated: 2024/09/23 15:06:59 by jlampio          ###   ########.fr       */
+/*   Updated: 2024/09/23 16:46:30 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "minishell.h"
+#include "minishell.h"
 
-static int execute_single_cmd(t_minishell *minishell, t_cmds *current_cmd, char **envp, int i)
+static int	execute_single_cmd(t_minishell *minishell,
+		t_cmds *current_cmd, char **envp, int i)
 {
-    if (i < minishell->num_cmds - 1) {
-        if (pipe(minishell->pipefds) == -1) {
-            perror("pipe ERROR");
-            return -1;
-        }
-    }
-    minishell->pid[i] = fork();
-    if (minishell->pid[i] == -1) {
-        perror("fork ERROR");
-        return -1;
-    }
-    
-    if (minishell->pid[i] == 0) {
-        execute_child_process(minishell, current_cmd, envp, i);
-    }
-
-    if (i < minishell->num_cmds - 1)
-        close(minishell->pipefds[1]);
-    return 0;
+	if (i < minishell->num_cmds - 1)
+	{
+		if (pipe(minishell->pipefds) == -1)
+		{
+			perror("pipe ERROR");
+			return (-1);
+		}
+	}
+	minishell->pid[i] = fork();
+	if (minishell->pid[i] == -1)
+	{
+		perror("fork ERROR");
+		return (-1);
+	}
+	if (minishell->pid[i] == 0)
+		execute_child_process(minishell, current_cmd, envp, i);
+	if (i < minishell->num_cmds - 1)
+		close(minishell->pipefds[1]);
+	return (0);
 }
 
-int execute_cmds(t_minishell *minishell, char **envp)
+int	execute_cmds(t_minishell *minishell, char **envp)
 {
-    t_cmds *current_cmd = minishell->cmds;
-    int i = 0;
+	t_cmds	*current_cmd;
+	int		i;
 
-    while (i < minishell->num_cmds) {
-        if (execute_single_cmd(minishell, current_cmd, envp, i) == -1)
-            return -1;
-
-        if (minishell->write_end != STDIN_FILENO)
-            close(minishell->write_end);
-
-        if (i < minishell->num_cmds - 1)
-            minishell->write_end = minishell->pipefds[0];
-        else if (minishell->num_cmds > 1)
-            close(minishell->pipefds[0]);
-
-        current_cmd = current_cmd->next;
-        i++;
-    }
-    return 0;
+	i = 0;
+	current_cmd = minishell->cmds;
+	while (i < minishell->num_cmds)
+	{
+		if (execute_single_cmd(minishell, current_cmd, envp, i) == -1)
+			return (-1);
+		if (minishell->write_end != STDIN_FILENO)
+			close(minishell->write_end);
+		if (i < minishell->num_cmds - 1)
+			minishell->write_end = minishell->pipefds[0];
+		else if (minishell->num_cmds > 1)
+			close(minishell->pipefds[0]);
+		current_cmd = current_cmd->next;
+		i++;
+	}
+	return (0);
 }

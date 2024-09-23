@@ -43,9 +43,12 @@ void	set_shlvl(t_env *env)
 	if (check)
 	{
 		temp = ft_itoa(ft_atoi(env->value) + 1);
-		free(env->value);
-		env->value = 0;
-		env->value = temp;
+		if (temp)
+		{
+			free(env->value);
+			env->value = 0;
+			env->value = temp;
+		}
 	}
 	else
 		env = make_node("SHLVL", "1");

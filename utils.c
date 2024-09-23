@@ -10,45 +10,47 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "minishell.h"
+#include "minishell.h"
 
-char *get_env_value(t_env *env_list, const char *key)
+char	*get_env_value(t_env *env_list, const char *key)
 {
-    t_env *tmp = env_list;
-    while (tmp)
-    {
-        if (ft_strcmp(tmp->key, key) == 0)
-            return tmp->value;
-        tmp = tmp->next;
-    }
-    return NULL;
+	t_env	*tmp;
+
+	tmp = env_list;
+	while (tmp)
+	{
+		if (ft_strcmp(tmp->key, key) == 0)
+			return (tmp->value);
+		tmp = tmp->next;
+	}
+	return (NULL);
 }
 
-char **build_argv(char *cmd_path, t_args *args)
+char	**build_argv(char *cmd_path, t_args *args)
 {
-    int argc = 0;
-    t_args *current_arg = args;
-    while (current_arg) {
-        argc++;
-        current_arg = current_arg->next;
-    }
+	int		argc;
+	t_args	*current_arg;
+	char	**argv;
+	int		i;
 
-    char **argv = malloc(sizeof(char *) * (argc + 2)); // cmd + args + NULL
-    if (!argv)
-        return NULL; // Handle memory allocation failure
-
-    // The first element in argv is the command itself
-    argv[0] = cmd_path;
-
-    // Copy each argument from the linked list to argv
-    current_arg = args;
-    for (int i = 0; i < argc; i++) {
-        argv[i + 1] = current_arg->arg; // Add arguments starting from argv[1]
-        current_arg = current_arg->next;
-    }
-
-    // The last element in argv must be NULL
-    argv[argc + 1] = NULL;
-	// write(1, "Built argv\n", 11);
-    return argv;
+	i = 0;
+	argc = 0;
+	current_arg = args;
+	while (current_arg)
+	{
+		argc++;
+		current_arg = current_arg->next;
+	}
+	argv = malloc(sizeof(char *) * (argc + 2));
+	if (!argv)
+		return (NULL);
+	argv[0] = cmd_path;
+	current_arg = args;
+	while (i < argc)
+	{
+		argv[i++ + 1] = current_arg->arg;
+		current_arg = current_arg->next;
+	}
+	argv[argc + 1] = NULL;
+	return (argv);
 }
