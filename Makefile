@@ -6,7 +6,7 @@
 #    By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/16 11:05:56 by alogvine          #+#    #+#              #
-#    Updated: 2024/09/23 16:04:27 by jlampio          ###   ########.fr        #
+#    Updated: 2024/09/23 18:14:23 by jlampio          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -36,7 +36,8 @@ SRCS = main.c				\
 	   builtin_export.c		\
 	   builtin_unset.c		\
 	   builtin_env.c		\
-	   builtin_pwd.c
+	   builtin_pwd.c		\
+	   redirs_heredoc.c		
 	   
 OBJ = $(SRCS:.c=.o)
 

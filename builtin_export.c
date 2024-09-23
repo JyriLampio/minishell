@@ -6,7 +6,7 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/23 15:08:24 by jlampio           #+#    #+#             */
-/*   Updated: 2024/09/23 17:48:03 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/23 18:30:51 by jlampio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,37 +34,58 @@ static void	print_exported_env(t_env *env)
 	}
 }
 
+// Function to update an existing environment variable
+static void	update_env_value(t_env *curr, char **split)
+{
+	if (split[1])
+	{
+		free(curr->value);
+		curr->value = ft_strdup(split[1]);
+	}
+	else
+	{
+		free(curr->value);
+		curr->value = NULL;
+	}
+}
+
+static void	add_new_env(t_env *env, char **split)
+{
+	t_env	*new_env;
+	t_env	*last;
+
+	new_env = malloc(sizeof(t_env));
+	if (!new_env)
+		return ;
+
+	new_env->key = ft_strdup(split[0]);
+
+	if (split[1])
+		new_env->value = ft_strdup(split[1]);
+	else
+		new_env->value = NULL;
+
+	new_env->next = NULL;
+
+	last = ft_lstlast(env);
+	last->next = new_env;
+}
+
 static void	update_or_add_env(t_env *env, char **split)
 {
 	t_env	*curr;
-	t_env	*new_env;
-	t_env	*last;
 
 	curr = env;
 	while (curr)
 	{
 		if (ft_strcmp(curr->key, split[0]) == 0)
 		{
-			if (split[1])
-			{
-				free(curr->value);
-				curr->value = ft_strdup(split[1]);
-			}
-			else
-			{
-				free(curr->value);
-				curr->value = NULL;
-			}
+			update_env_value(curr, split);
 			return ;
 		}
 		curr = curr->next;
 	}
-	new_env = malloc(sizeof(t_env));
-	new_env->key = ft_strdup(split[0]);
-	new_env->value = split[1] ? ft_strdup(split[1]) : NULL;
-	new_env->next = NULL;
-	last = ft_lstlast(env);
-	last->next = new_env;
+	add_new_env(env, split);
 }
 
 void	builtin_export(t_env *env, t_args *args)

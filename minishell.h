@@ -6,7 +6,7 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 10:33:14 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/23 17:41:07 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/23 18:15:28 by jlampio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,5 +160,7 @@ void			close_fds(t_minishell *minishell);
 int				handle_redirections(t_cmds *cmd);
 int				has_input_redirection(t_redirs *redirs);
 int				has_output_redirection(t_redirs *redirs);
+int				handle_redir_heredoc(t_redirs *redir);
+int				handle_redir_append(t_redirs *redir);
 
 #endif
