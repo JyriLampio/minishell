@@ -6,7 +6,7 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 11:44:43 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/22 18:59:03 by jlampio          ###   ########.fr       */
+/*   Updated: 2024/09/23 08:09:57 by jlampio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,17 +40,6 @@ void	cmd_echo(t_args *args)
 		ft_putstr_fd("\n", 1);
 }
 
-void builtin_cd(char **args)
-{
-    if (!args[0]) {
-        fprintf(stderr, "cd: missing argument\n");
-        return;
-    }
-    if (chdir(args[0]) != 0) {
-        perror("cd");
-    }
-}
-
 void	print_env(t_env *env)
 {
 	t_env	*current;
@@ -71,45 +60,16 @@ void	print_env(t_env *env)
 	}
 }
 
-
-char	**arr_args(t_args *args)
-{
-	char	**str;
-	int		i;
-	t_args	*curr;
-
-	i = 0;
-	curr = args;
-	while (curr)
-	{
-		curr = curr->next;
-		i++;
-	}
-	str = malloc(sizeof(t_args) * (i + 1));
-	if (!str)
-		return (0);
-	str[i] = 0;
-	i = 0;
-	while (args)
-	{
-		str[i++] = ft_strdup(args->arg);
-		args = args->next;
-	}
-	return (str);
-}
-
 void get_cwd(void)
 {
     char cwd[1024];
     if (getcwd(cwd, sizeof(cwd)) != NULL)
     {
-        ft_putstr_fd(cwd, STDOUT_FILENO);  // Write to stdout or the pipe
-        ft_putstr_fd("\n", STDOUT_FILENO);  // Add a newline
+        ft_putstr_fd(cwd, STDOUT_FILENO);
+        ft_putstr_fd("\n", STDOUT_FILENO);
     }
     else
-    {
-        perror("getcwd() error");  // If getcwd fails, you can still use perror for errors
-    }
+        perror("getcwd() error");
 }
 
 void print_exported_env(t_env *env)
@@ -134,30 +94,6 @@ void print_exported_env(t_env *env)
     }
 }
 
-#include <stdlib.h>
-#include <string.h>
-
-// A helper function to split the string on the first occurrence of '='
-char **split_on_first_equals(char *str)
-{
-    char **result = malloc(sizeof(char *) * 3);  // Allocate space for key, value, and NULL
-    char *equal_sign = ft_strchr(str, '=');  // Find the first '='
-
-    if (!equal_sign)
-    {
-        result[0] = strdup(str);  // No '=' found, the whole string is the key
-        result[1] = NULL;         // No value
-    }
-    else
-    {
-        *equal_sign = '\0';  // Temporarily null-terminate at the first '='
-        result[0] = ft_strdup(str);      // The key
-        result[1] = ft_strdup(equal_sign + 1);  // The value (everything after the '=')
-    }
-    result[2] = NULL;  // Null-terminate the array
-    return result;
-}
-
 void builtin_export(t_env *env, t_args *args)
 {
     t_env *curr;
@@ -171,7 +107,7 @@ void builtin_export(t_env *env, t_args *args)
 
     while (args)
     {
-        split = split_on_first_equals(args->arg);  // Use the new function to split the key and value
+        split = split_on_first_equals(args->arg);
         curr = env;
 
         while (curr)
@@ -186,82 +122,25 @@ void builtin_export(t_env *env, t_args *args)
                 else
                 {
                     free(curr->value);
-                    curr->value = NULL;  // Set the value to NULL if there's no value in the argument
+                    curr->value = NULL;
                 }
                 break;
             }
             curr = curr->next;
         }
-
-        // If key does not exist, create a new environment variable
         if (!curr)
         {
             t_env *new_env = malloc(sizeof(t_env));
             new_env->key = ft_strdup(split[0]);
             new_env->value = split[1] ? ft_strdup(split[1]) : NULL;
             new_env->next = NULL;
-
-            // Find the last node of the environment list to append the new variable
             t_env *last = ft_lstlast(env);
             last->next = new_env;
         }
-
-        // Free split array to avoid memory leaks
-        // free_split(split);
 		freestr(split);
-
-        // Move to the next argument in the list
         args = args->next;
     }
 }
-
-
-// void builtin_export(t_env *env, t_args *args)
-// {
-//     t_env *curr;
-//     char **split;
-
-//     if (!args)
-// 	{
-//         print_exported_env(env);
-//         return;
-//     }
-//     while (args) {
-//         split = ft_split(args->arg, '=');
-//         curr = env;
-//         while (curr) {
-//             if (ft_strcmp(curr->key, split[0]) == 0) {
-//                 if (split[1]) {
-//                     free(curr->value);
-//                     curr->value = ft_strdup(split[1]);
-//                 } else {
-//                     free(curr->value);
-//                     curr->value = NULL;  // Set the value to NULL if there's no value in the argument
-//                 }
-//                 break;
-//             }
-//             curr = curr->next;
-//         }
-
-//         // If key does not exist, create a new environment variable
-//         if (!curr) {
-//             t_env *new_env = malloc(sizeof(t_env));
-//             new_env->key = ft_strdup(split[0]);
-//             new_env->value = split[1] ? ft_strdup(split[1]) : NULL;
-//             new_env->next = NULL;
-
-//             // Find the last node of the environment list to append the new variable
-//             t_env *last = ft_lstlast(env);
-//             last->next = new_env;
-//         }
-
-//         // Free split array to avoid memory leaks
-//         free_split(split);
-
-//         // Move to the next argument in the list
-//         args = args->next;
-//     }
-// }
 
 void builtin_unset(t_env **env, t_args *args)
 {
@@ -291,26 +170,17 @@ void builtin_unset(t_env **env, t_args *args)
 void execute_builtin(t_minishell *minishell, t_cmds *current_cmd)
 {
 	t_cmds	*cmds;
-	// write(1, "Checking builtins...\n", 21);
-	// cmds = minishell->cmds;
-	cmds = current_cmd;
 
+	cmds = current_cmd;
 	if (!ft_strcmp("echo", cmds->cmd))
 		cmd_echo(cmds->args);
 	else if (!ft_strcmp("cd", cmds->cmd))
-		// printf("BUILTIN: CD\n");
-		builtin_cd(arr_args(cmds->args));
+		builtin_cd(arr_args(cmds->args), minishell->env);
 	else if (!ft_strcmp("pwd", cmds->cmd))
-		// printf("BUILTIN: PWD\n");
 		get_cwd();
 	else if (!ft_strcmp("export", cmds->cmd))
-		// printf("BUILTIN: export\n");
-		{
-			printf("BUILTIN: EXPORT\n");
 			builtin_export(minishell->env, cmds->args);
-		}
 	else if (!ft_strcmp("unset", cmds->cmd))
-		// printf("BUILTIN: UNSET\n");
 		builtin_unset(&minishell->env, cmds->args);
 	else if (!ft_strcmp("env", cmds->cmd))
 		print_env(minishell->env);
@@ -361,7 +231,7 @@ int	check_builtins(t_minishell *minishell)
 	cmds = minishell->cmds;
 	if (cmds->next == NULL && cmds->cmd && is_builtin(cmds->cmd))  // Only one command
 	{
-		printf("Single command builtin\n");
+		// printf("Single command builtin\n");
 			// execute_builtin(minishell, cmds);
 			execute_single_builtin(minishell, cmds);
 		// else

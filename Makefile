@@ -6,7 +6,7 @@
 #    By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/16 11:05:56 by alogvine          #+#    #+#              #
-#    Updated: 2024/09/22 15:43:19 by jlampio          ###   ########.fr        #
+#    Updated: 2024/09/23 07:46:13 by jlampio          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,6 +17,7 @@ SRCS = main.c			\
 	   parsing.c		\
 	   pipe.c			\
 	   builtins_utils.c	\
+	   builtin_cd.c		\
 	   
 OBJ = $(SRCS:.c=.o)
 

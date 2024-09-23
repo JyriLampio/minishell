@@ -6,7 +6,7 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 10:33:14 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/22 21:00:43 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/23 08:09:05 by jlampio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,6 +100,7 @@ char	*ft_itoa(int i);
 void	*ft_calloc(size_t count, size_t size);
 int		check_arrow_file(char *s);
 // execve and builtins
+char	*get_env_value(t_env *env_list, const char *key);
 t_env	*ft_lstlast(t_env *lst);
 void	free_split(char **split);
 // void	check_builtins(t_minishell *minishell);
@@ -108,5 +109,9 @@ void	execute_builtin(t_minishell *minishell, t_cmds *current_cmd);
 int		pipe_x(t_minishell *minishell);
 int		wait_processes(int pid);
 int		handle_redirections(t_cmds *cmd);
+void	builtin_cd(char **args, t_env *env);
+void	update_environment_variable(t_env *env, char *key, char *value);
+char	**arr_args(t_args *args);
+char	**split_on_first_equals(char *str);
 
 #endif
