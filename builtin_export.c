@@ -34,7 +34,6 @@ static void	print_exported_env(t_env *env)
 	}
 }
 
-// Function to update an existing environment variable
 static void	update_env_value(t_env *curr, char **split)
 {
 	if (split[1])
@@ -57,16 +56,12 @@ static void	add_new_env(t_env *env, char **split)
 	new_env = malloc(sizeof(t_env));
 	if (!new_env)
 		return ;
-
 	new_env->key = ft_strdup(split[0]);
-
 	if (split[1])
 		new_env->value = ft_strdup(split[1]);
 	else
 		new_env->value = NULL;
-
 	new_env->next = NULL;
-
 	last = ft_lstlast(env);
 	last->next = new_env;
 }

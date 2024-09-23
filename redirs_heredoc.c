@@ -74,4 +74,3 @@ int	handle_redir_append(t_redirs *redir)
 	close(fd);
 	return (0);
 }
-
