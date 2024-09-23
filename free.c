@@ -14,48 +14,42 @@
 
 void	freeargs(t_args *args)
 {
-	t_args	*curr;
 	t_args	*temp;
 
-	curr = args;
-	while (curr)
+	while (args)
 	{
-		temp = curr;
-		free(curr->arg);
-		curr = curr->next;
+		temp = args;
+		free(args->arg);
+		args = args->next;
 		free(temp);
 	}
 }
 
 void	freeredirs(t_redirs *redirs)
 {
-	t_redirs	*curr;
 	t_redirs	*temp;
 
-	curr = redirs;
-	while (curr)
+	while (redirs)
 	{
-		temp = curr;
-		free(curr->file);
-		curr = curr->next;
+		temp = redirs;
+		free(redirs->file);
+		redirs = redirs->next;
 		free(temp);
 	}
 }
 
 void	freecmds(t_cmds *cmds)
 {
-	t_cmds	*curr;
 	t_cmds	*temp;
 
 	freeargs(cmds->args);
-	curr = cmds;
-	while (curr)
+	while (cmds)
 	{
-		temp = curr;
-		free(curr->cmd);
-		if (curr->redirs)
-			freeredirs(curr->redirs);
-		curr = curr->next;
+		temp = cmds;
+		free(cmds->cmd);
+		if (cmds->redirs)
+			freeredirs(cmds->redirs);
+		cmds = cmds->next;
 		free(temp);
 	}
 }
@@ -64,7 +58,6 @@ void	freeenv(t_env *env)
 {
 	t_env	*temp;
 
-	temp = env;
 	while (env)
 	{
 		temp = env;

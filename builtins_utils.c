@@ -23,7 +23,7 @@ void	update_environment_variable(t_env *env, char *key, char *value)
 		{
 			free(current->value);
 			current->value = ft_strdup(value);
-			break;
+			break ;
 		}
 		current = current->next;
 	}
@@ -70,22 +70,24 @@ char	**arr_args(t_args *args)
 }
 
 // A helper function to split the string on the first occurrence of '='
-char **split_on_first_equals(char *str)
+char	**split_on_first_equals(char *str)
 {
-    char **result = malloc(sizeof(char *) * 3);
-    char *equal_sign = ft_strchr(str, '=');
+	char	**result;
+	char	*equal_sign;
 
-    if (!equal_sign)
-    {
-        result[0] = ft_strdup(str);
-        result[1] = NULL;
-    }
-    else
-    {
-        *equal_sign = '\0';
-        result[0] = ft_strdup(str);
-        result[1] = ft_strdup(equal_sign + 1);
-    }
-    result[2] = NULL;
-    return result;
+	result = malloc(sizeof(char *) * 3);
+	equal_sign = ft_strchr(str, '=');
+	if (!equal_sign)
+	{
+		result[0] = ft_strdup(str);
+		result[1] = NULL;
+	}
+	else
+	{
+		*equal_sign = '\0';
+		result[0] = ft_strdup(str);
+		result[1] = ft_strdup(equal_sign + 1);
+	}
+	result[2] = NULL;
+	return (result);
 }

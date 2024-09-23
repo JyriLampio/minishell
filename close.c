@@ -10,21 +10,21 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "minishell.h"
+#include "minishell.h"
 
-void close_fd(int *fd)
+void	close_fd(int *fd)
 {
-    if (*fd != -1) {
-        close(*fd);
-        *fd = -1;
-    }
+	if (*fd != -1)
+	{
+		close(*fd);
+		*fd = -1;
+	}
 }
-// CLOSEE VIEL LISÄÄ JOS TARVII
-void close_fds(t_minishell *minishell)
-{
-    close_fd(&minishell->pipefds[0]);
-    close_fd(&minishell->pipefds[1]);
-    if (minishell->write_end > 0)
-        close(minishell->write_end);
 
+void	close_fds(t_minishell *minishell)
+{
+	close_fd(&minishell->pipefds[0]);
+	close_fd(&minishell->pipefds[1]);
+	if (minishell->write_end > 0)
+		close(minishell->write_end);
 }
