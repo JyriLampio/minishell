@@ -16,21 +16,21 @@ char	*qexpand(char *new, char *line, t_minishell *minishell)
 {
 	char	*temp;
 
-	while (new && *line && *line != '"')
+	while (*line && *line != '"')
 	{
-		if (new && *line == '$' && (*(line + 1) == '"' || *(line + 1) == ' '
+		if (*line == '$' && (*(line + 1) == '"' || *(line + 1) == ' '
 				|| !*(line + 1)))
 			new = cjoin(new, *line++);
-		else if (new && *line == '$' && *(line + 1) == '?')
+		else if (*line == '$' && *(line + 1) == '?')
 		{
 			temp = new;
 			new = ft_strjoin(new, ft_itoa(minishell->exit_status));
 			line += 2;
 			free(temp);
 		}
-		else if (new && *line == '$' && *(line + 1) == '\'')
+		else if (*line == '$' && *(line + 1) == '\'')
 			new = cjoin(new, *line);
-		else if (new && *line == '$')
+		else if (*line == '$')
 		{
 			new = expjoin(new, line, minishell->env);
 			line += dlen(line);
@@ -51,16 +51,16 @@ char	*noexpand(char *new, char *line)
 
 char	*dexpand(char *new, char *line, t_minishell *minishell)
 {
-	if (new && (!*(line + 1) || *(line + 1) == ' '))
+	if ((!*(line + 1) || *(line + 1) == ' '))
 		new = cjoin(new, '$');
-	else if (new && *(line + 1) && (*(line + 1) == '"' || *(line + 1) == '\''))
+	else if (*(line + 1) && (*(line + 1) == '"' || *(line + 1) == '\''))
 		line++;
-	else if (new && *(line + 1) && *(line + 1) == '?')
+	else if (*(line + 1) && *(line + 1) == '?')
 	{
 		new = ft_strjoin(new, ft_itoa(minishell->exit_status));
 		line += 2;
 	}
-	else if (new && *line)
+	else if (*line)
 		new = expjoin(new, line, minishell->env);
 	return (new);
 }
@@ -70,7 +70,7 @@ char	*expand(char *line, t_minishell *minishell)
 	char	*new;
 
 	new = ft_strdup("");
-	while (new && *line)
+	while (*line)
 	{
 		if (*line == '\'')
 		{

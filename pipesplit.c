@@ -16,9 +16,17 @@ int	qlen(char *line, char c)
 {
 	int	i;
 
-	i = 1;
-	while (line[i] && line[i] != c)
+	i = 0;
+	if (*line)
+	{
+		line++;
+		i = 1;
+	}
+	while (*line && *line != c)
+	{
+		line++;
 		i++;
+	}
 	i++;
 	return (i);
 }

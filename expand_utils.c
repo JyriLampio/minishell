@@ -56,9 +56,6 @@ char	*parse_key(char *new, char *key)
 	if (new)
 	{
 		temp = new;
-		new = ft_strdup("");
-		if (new)
-			return (new);
 		new = ft_strjoin(new, key);
 		free(temp);
 	}
@@ -72,14 +69,16 @@ char	*expjoin(char *new, char *line, t_env *env)
 	char	*key;
 
 	key = ft_strdup("");
-	if (key && new && *line++ == '$')
+	if (!key)
+		return (0);
+	if (*line++ == '$')
 	{
-		while (key && *line && *line != ' ' && *line != '"' && *line != '\'')
+		while (*line && *line != ' ' && *line != '"' && *line != '\'')
 			key = cjoin(key, *line++);
-		while (new && key && env)
+		while (env)
 		{
 			if (!ft_strcmp(key, env->key))
-				new = parse_key(new, env->key);
+				new = parse_key(new, env->value);
 			env = env->next;
 		}
 	}
