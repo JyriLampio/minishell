@@ -6,7 +6,7 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/23 18:12:50 by jlampio           #+#    #+#             */
-/*   Updated: 2024/09/23 21:50:55 by jlampio          ###   ########.fr       */
+/*   Updated: 2024/09/23 23:01:15 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,59 +14,58 @@
 
 static int	read_heredoc_input(int write_fd, const char *limiter)
 {
-    char *line;
+	char	*line;
 
-    while (1)
-    {
-        line = readline("> ");
-        if (!line || strcmp(line, limiter) == 0)
-        {
-            free(line);
-            break;
-        }
-        if (write(write_fd, line, strlen(line)) == -1)
-        {
-            perror("write");
-            free(line);
-            return (-1);
-        }
-        if (write(write_fd, "\n", 1) == -1)
-        {
-            perror("write");
-            free(line);
-            return (-1);
-        }
-        free(line);
-    }
-    return (0);
+	while (1)
+	{
+		line = readline("> ");
+		if (!line || strcmp(line, limiter) == 0)
+		{
+			free(line);
+			break ;
+		}
+		if (write(write_fd, line, strlen(line)) == -1)
+		{
+			perror("write");
+			free(line);
+			return (-1);
+		}
+		if (write(write_fd, "\n", 1) == -1)
+		{
+			perror("write");
+			free(line);
+			return (-1);
+		}
+		free(line);
+	}
+	return (0);
 }
 
 static int	handle_heredoc(t_redirs *redir)
 {
-    int pipefd[2];
+	int	pipefd[2];
 
-    if (pipe(pipefd) == -1)
-    {
-        perror("pipe");
-        return (-1);
-    }
-    if (read_heredoc_input(pipefd[1], redir->file) == -1)
-    {
-        close(pipefd[0]);
-        close(pipefd[1]);
-        return (-1);
-    }
-    close(pipefd[1]);
-    if (dup2(pipefd[0], STDIN_FILENO) == -1)
-    {
-        perror("dup2");
-        close(pipefd[0]);
-        return (-1);
-    }
-    close(pipefd[0]);
-    return (0);
+	if (pipe(pipefd) == -1)
+	{
+		perror("pipe");
+		return (-1);
+	}
+	if (read_heredoc_input(pipefd[1], redir->file) == -1)
+	{
+		close(pipefd[0]);
+		close(pipefd[1]);
+		return (-1);
+	}
+	close(pipefd[1]);
+	if (dup2(pipefd[0], STDIN_FILENO) == -1)
+	{
+		perror("dup2");
+		close(pipefd[0]);
+		return (-1);
+	}
+	close(pipefd[0]);
+	return (0);
 }
-
 
 int	handle_redir_heredoc(t_redirs *redir)
 {

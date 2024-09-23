@@ -6,7 +6,7 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 10:36:37 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/23 22:46:52 by jlampio          ###   ########.fr       */
+/*   Updated: 2024/09/23 22:58:19 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,10 +54,10 @@ void	bobershell(t_minishell *minishell)
 	while (1)
 	{
 		line = readline("bobershell> ");
-		if (!line) // Ctrl+D returns NULL
+		if (!line)
 		{
-			printf("exit\n"); // Print "exit" just like bash when Ctrl+D is pressed
-			break; // Exit the loop
+			printf("exit\n");
+			break ;
 		}
 		signal(SIGINT, handle_parent_signals);
 		add_history(line);

@@ -6,13 +6,12 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/23 09:23:23 by jlampio           #+#    #+#             */
-/*   Updated: 2024/09/23 22:10:48 by jlampio          ###   ########.fr       */
+/*   Updated: 2024/09/23 22:56:43 by alogvine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-// int		g_signum = 0;
 extern int	g_exit;
 
 void	handle_parent_signals(int sig)
