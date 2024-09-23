@@ -6,7 +6,7 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/23 14:45:07 by jlampio           #+#    #+#             */
-/*   Updated: 2024/09/23 17:12:20 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/23 18:48:17 by jlampio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,11 @@ char	*find_executable(char *cmd, t_env *env_list)
 
 	if (cmd[0] == '/' || ft_strncmp(cmd, "./", 2) == 0
 		|| ft_strncmp(cmd, "../", 3) == 0)
-		return (access(cmd, X_OK) == 0 ? ft_strdup(cmd) : NULL);
+	{
+		if (access(cmd, X_OK) == 0)
+			return (ft_strdup(cmd));
+		return (NULL);
+	}
 	path = get_env_value(env_list, "PATH");
 	if (!path)
 		return (NULL);
