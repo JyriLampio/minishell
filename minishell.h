@@ -136,7 +136,7 @@ int				prepare_execution(t_minishell *minishell);
 int				error_msg(t_minishell *minishell, char *file, int exit_code);
 int				ft_strncmp(const char *s1, const char *s2, size_t n);
 int				is_builtin(char *cmd);
-void			safe_exit(t_minishell *minishell, int status);
+void			safe_exit(t_minishell *minishell, int status, char **envp);
 char			*find_executable(char *cmd, t_env *env_list);
 int				execute_cmds(t_minishell *minishell, char **envp);
 void			execute_child_process(t_minishell *minishell,

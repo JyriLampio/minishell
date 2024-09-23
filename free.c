@@ -42,7 +42,8 @@ void	freecmds(t_cmds *cmds)
 {
 	t_cmds	*temp;
 
-	freeargs(cmds->args);
+	if (cmds->args)
+		freeargs(cmds->args);
 	while (cmds)
 	{
 		temp = cmds;
@@ -76,6 +77,8 @@ void	freeminishell(t_minishell *minishell)
 			freeenv(minishell->env);
 		if (minishell->cmds)
 			freecmds(minishell->cmds);
+		free(minishell->pid);
+		minishell->pid = 0;
 		free(minishell);
 	}
 	rl_clear_history();

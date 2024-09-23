@@ -71,8 +71,10 @@ int	is_builtin(char *cmd)
 			|| !ft_strcmp(cmd, "exit")));
 }
 
-void	safe_exit(t_minishell *minishell, int status)
+void	safe_exit(t_minishell *minishell, int status, char **envp)
 {
+	if (envp)
+		freestr(envp);
 	if (minishell->pid)
 	{
 		free(minishell->pid);

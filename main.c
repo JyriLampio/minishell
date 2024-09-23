@@ -60,8 +60,7 @@ void	bobershell(t_minishell *minishell)
 		}
 		if (add_to_structs(line, minishell))
 			return ;
-		if (do_command(minishell))
-			return ;
+		do_command(minishell);
 		freecmds(minishell->cmds);
 		minishell->cmds = 0;
 		free(line);

@@ -87,27 +87,27 @@ void	execute_child_process(t_minishell *minishell,
 	char	**argv;
 
 	if (handle_redirections(current_cmd) == -1)
-		safe_exit(minishell, 1);
+		safe_exit(minishell, 1, envp);
 	if (dup_file_descriptors(minishell, current_cmd, index) == -1)
-		safe_exit(minishell, 1);
+		safe_exit(minishell, 1, envp);
 	if (current_cmd->cmd == NULL)
-		safe_exit(minishell, 1);
+		safe_exit(minishell, 1, envp);
 	if (is_builtin(current_cmd->cmd))
 	{
 		minishell->exit_status = execute_builtin(minishell, current_cmd);
-		safe_exit(minishell, 1);
+		safe_exit(minishell, 1, envp);
 	}
 	cmd_path = find_executable(current_cmd->cmd, minishell->env);
 	if (cmd_path == NULL)
 	{
 		ft_putstr_fd(current_cmd->cmd, 2);
 		ft_putstr_fd(": command not found\n", 2);
-		safe_exit(minishell, 127);
+		safe_exit(minishell, 127, envp);
 	}
 	argv = build_argv(cmd_path, current_cmd->args);
 	execve(cmd_path, argv, envp);
 	perror("execve ERROR");
-	safe_exit(minishell, 1);
+	safe_exit(minishell, 1, envp);
 }
 
 int	pipe_x(t_minishell *minishell)
