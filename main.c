@@ -6,11 +6,13 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 10:36:37 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/23 13:35:50 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/23 22:46:52 by jlampio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+int			g_exit;
 
 int	add_to_structs(char *line, t_minishell *minishell)
 {
@@ -52,6 +54,12 @@ void	bobershell(t_minishell *minishell)
 	while (1)
 	{
 		line = readline("bobershell> ");
+		if (!line) // Ctrl+D returns NULL
+		{
+			printf("exit\n"); // Print "exit" just like bash when Ctrl+D is pressed
+			break; // Exit the loop
+		}
+		signal(SIGINT, handle_parent_signals);
 		add_history(line);
 		if (!line || check_syntax(line))
 		{

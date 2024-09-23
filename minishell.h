@@ -6,7 +6,7 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 10:33:14 by alogvine          #+#    #+#             */
-/*   Updated: 2024/09/23 18:15:28 by jlampio          ###   ########.fr       */
+/*   Updated: 2024/09/23 22:09:18 by jlampio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,6 +148,10 @@ void			builtin_unset(t_env **env, t_args *args);
 
 // Signal handling
 void			handle_parent_signals(int sig);
+void			sigint_handler_in_child(int sig);
+void			sigquit_handler_in_child(int sig);
+void			sigint_handler_after_here_doc(int sig);
+void			sigint_handler_here_doc(int sig);
 
 // Duplication functions
 int				dup_stdin(t_minishell *minishell, t_cmds *cmd);

@@ -6,7 +6,7 @@
 /*   By: jlampio <jlampio@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/23 14:53:10 by jlampio           #+#    #+#             */
-/*   Updated: 2024/09/23 16:46:30 by alogvine         ###   ########.fr       */
+/*   Updated: 2024/09/23 22:44:46 by jlampio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,11 @@ static int	execute_single_cmd(t_minishell *minishell,
 		return (-1);
 	}
 	if (minishell->pid[i] == 0)
+	{
+		signal(SIGINT, SIG_DFL);
+		signal(SIGQUIT, SIG_DFL);
 		execute_child_process(minishell, current_cmd, envp, i);
+	}
 	if (i < minishell->num_cmds - 1)
 		close(minishell->pipefds[1]);
 	return (0);
